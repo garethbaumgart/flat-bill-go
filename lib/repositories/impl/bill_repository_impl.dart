@@ -39,7 +39,11 @@ class BillRepositoryImpl implements BillRepository {
   @override
   Future<Bill?> loadBill(String id) async {
     final List<Bill> bills = await _loadAllBills();
-    return bills.firstWhere((b) => b.id == id, orElse: () => null);
+    try {
+      return bills.firstWhere((b) => b.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
