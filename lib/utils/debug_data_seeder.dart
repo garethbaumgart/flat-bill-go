@@ -9,12 +9,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DebugDataSeeder {
   static Future<void> seedTestData(WidgetRef ref) async {
+    print('🔧 Debug: Starting to seed test data...');
+    
     // Seed Property
     final property = Property(
       name: 'Sunset Apartments',
       address: '123 Main Street, Cape Town, 8001',
     );
     await ref.read(propertyControllerProvider.notifier).saveProperty(property);
+    print('🔧 Debug: Property saved successfully');
 
     // Seed Sample Bills
     final bills = [
@@ -75,9 +78,12 @@ class DebugDataSeeder {
     ];
 
     // Save all bills
+    print('🔧 Debug: Saving ${bills.length} bills...');
     for (final bill in bills) {
       await ref.read(billControllerProvider.notifier).saveBill(bill);
+      print('🔧 Debug: Saved bill ${bill.id}');
     }
+    print('🔧 Debug: All test data seeded successfully!');
   }
 
   static Bill _createSampleBill({

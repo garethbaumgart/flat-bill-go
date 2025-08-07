@@ -70,9 +70,11 @@ class MainBillListScreen extends ConsumerWidget {
         ],
       ),
       body: billsAsync.when(
-        data: (bills) => bills.isEmpty
-            ? const Center(child: Text('(No bills yet)'))
-            : ListView.builder(
+        data: (bills) {
+          print('🔧 Debug: Main screen loaded ${bills.length} bills');
+          return bills.isEmpty
+              ? const Center(child: Text('(No bills yet)'))
+              : ListView.builder(
                 itemCount: bills.length,
                 itemBuilder: (context, index) {
                   final Bill bill = bills[index];

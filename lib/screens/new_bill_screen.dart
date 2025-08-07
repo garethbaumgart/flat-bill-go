@@ -89,6 +89,33 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
     return value.replaceAll('R', '').replaceAll(',', '');
   }
 
+  void _fillTestData() {
+    // Set dates
+    setState(() {
+      _periodStart = DateTime(2024, 4, 1);
+      _periodEnd = DateTime(2024, 4, 30);
+    });
+    
+    // Electricity data
+    _electricityOpenController.text = '12720';
+    _electricityCloseController.text = '12850';
+    _electricityTariffController.text = '3.40';
+    
+    // Water data
+    _waterOpenController.text = '222';
+    _waterCloseController.text = '230';
+    _waterTariff0to6Controller.text = '20.80';
+    _waterTariff7to15Controller.text = '34.20';
+    _waterTariff16to30Controller.text = '48.50';
+    
+    // Sanitation data
+    _sanitationOpenController.text = '222';
+    _sanitationCloseController.text = '230';
+    _sanitationTariff0to6Controller.text = '25.50';
+    _sanitationTariff7to15Controller.text = '20.50';
+    _sanitationTariff16to30Controller.text = '29.80';
+  }
+
   Future<void> _calculateBill() async {
     if (_formKey.currentState!.validate() && _periodStart != null && _periodEnd != null) {
       try {
@@ -228,6 +255,19 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Bill'),
+        actions: [
+          // Debug button for pre-filling test data
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: () {
+              _fillTestData();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Test data filled!')),
+              );
+            },
+            tooltip: 'Fill Test Data (Debug)',
+          ),
+        ],
       ),
       body: Form(
         key: _formKey,
