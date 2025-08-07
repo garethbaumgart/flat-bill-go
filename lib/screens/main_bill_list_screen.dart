@@ -78,7 +78,52 @@ class MainBillListScreen extends ConsumerWidget {
                 itemCount: bills.length,
                 itemBuilder: (context, index) {
                   final Bill bill = bills[index];
-                  return Card(
+                  return Dismissible(
+                    key: Key(bill.id),
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                    ),
+                    direction: DismissDirection.endToStart,
+                    confirmDismiss: (direction) async {
+                      return await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Delete Bill'),
+                            content: Text('Are you sure you want to delete this bill for ${_formatDate(bill.periodStart)} - ${_formatDate(bill.periodEnd)}?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(true),
+                                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    onDismissed: (direction) async {
+                      await ref.read(billControllerProvider.notifier).deleteBill(bill.id);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Bill deleted successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    },
+                    child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     elevation: 2,
                     child: ListTile(
