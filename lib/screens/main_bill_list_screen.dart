@@ -22,7 +22,24 @@ class MainBillListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: propertyAsync.when(
-          data: (property) => Text(property?.name ?? 'My Flat'),
+          data: (property) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                property?.name ?? 'My Flat',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              if (property?.address != null && property!.address.isNotEmpty)
+                Text(
+                  property.address,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+            ],
+          ),
           loading: () => const Text('Loading...'),
           error: (err, stack) => const Text('Error'),
         ),
