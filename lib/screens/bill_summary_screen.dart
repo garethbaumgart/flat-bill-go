@@ -35,10 +35,12 @@ class BillSummaryScreen extends StatelessWidget {
 
   Future<void> _exportToPDF(BuildContext context) async {
     try {
+      print('🔧 Debug: Starting PDF export...');
+      
       // Create PDF document
       final pdf = pw.Document();
       
-      // Add page to PDF
+      // Add page to PDF with simpler content
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
@@ -46,103 +48,44 @@ class BillSummaryScreen extends StatelessWidget {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                // Header
-                pw.Header(
-                  level: 0,
-                  child: pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-                ),
+                // Simple header
+                pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 20)),
                 pw.SizedBox(height: 20),
                 
                 // Period
-                pw.Text('Billing Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)}', 
-                  style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.Text('Billing Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)}'),
                 pw.SizedBox(height: 20),
                 
-                // Bill details table
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  children: [
-                    // Header row
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Utility', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        pw.Text('Opening', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        pw.Text('Closing', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        pw.Text('Units Used', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        pw.Text('Cost (ZAR)', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      ],
-                    ),
-                    // Electricity row
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Electricity'),
-                        pw.Text(bill.electricityReading.opening.toString()),
-                        pw.Text(bill.electricityReading.closing.toString()),
-                        pw.Text(bill.electricityReading.unitsUsed.toString()),
-                        pw.Text(_formatCurrency(electricityCost)),
-                      ],
-                    ),
-                    // Water row
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Water'),
-                        pw.Text(bill.waterReading.opening.toString()),
-                        pw.Text(bill.waterReading.closing.toString()),
-                        pw.Text(bill.waterReading.unitsUsed.toString()),
-                        pw.Text(_formatCurrency(waterCost)),
-                      ],
-                    ),
-                    // Sanitation row
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Sanitation'),
-                        pw.Text(bill.sanitationReading.opening.toString()),
-                        pw.Text(bill.sanitationReading.closing.toString()),
-                        pw.Text(bill.sanitationReading.unitsUsed.toString()),
-                        pw.Text(_formatCurrency(sanitationCost)),
-                      ],
-                    ),
-                  ],
-                ),
+                // Simple bill details
+                pw.Text('Electricity: ${_formatCurrency(electricityCost)}'),
+                pw.Text('Water: ${_formatCurrency(waterCost)}'),
+                pw.Text('Sanitation: ${_formatCurrency(sanitationCost)}'),
                 pw.SizedBox(height: 20),
                 
                 // Totals
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('Subtotal:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text(_formatCurrency(subtotal)),
-                  ],
-                ),
-                pw.SizedBox(height: 10),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('VAT (15%):', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text(_formatCurrency(vat)),
-                  ],
-                ),
-                pw.SizedBox(height: 10),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('Total:', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                    pw.Text(_formatCurrency(total), style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                  ],
-                ),
+                pw.Text('Subtotal: ${_formatCurrency(subtotal)}'),
+                pw.Text('VAT (15%): ${_formatCurrency(vat)}'),
+                pw.Text('Total: ${_formatCurrency(total)}', style: pw.TextStyle(fontSize: 16)),
               ],
             );
           },
         ),
       );
       
+      print('🔧 Debug: PDF document created, getting directory...');
+      
       // Get the documents directory
       final directory = await getApplicationDocumentsDirectory();
       final fileName = 'bill_${bill.id}_${bill.periodStart.year}_${bill.periodStart.month.toString().padLeft(2, '0')}_${bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
       final file = File('${directory.path}/$fileName');
       
+      print('🔧 Debug: Saving PDF to ${file.path}');
+      
       // Write PDF to file
-      await file.writeAsBytes(await pdf.save());
+      final bytes = await pdf.save();
+      await file.writeAsBytes(bytes);
+      
+      print('🔧 Debug: PDF saved successfully');
       
       // Show success message
       if (context.mounted) {
@@ -155,6 +98,7 @@ class BillSummaryScreen extends StatelessWidget {
         );
       }
     } catch (e) {
+      print('🔧 Debug: PDF export error: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
