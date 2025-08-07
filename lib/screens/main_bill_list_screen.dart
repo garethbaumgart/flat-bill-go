@@ -133,7 +133,8 @@ class MainBillListScreen extends ConsumerWidget {
                     ),
                   );
                 },
-              ),
+              );
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
