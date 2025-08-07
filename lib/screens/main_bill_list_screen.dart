@@ -5,9 +5,14 @@ import '../controllers/bill_controller.dart';
 import '../entities/bill.dart';
 import 'property_details_screen.dart';
 import 'new_bill_screen.dart';
+import 'bill_summary_screen.dart';
 
 class MainBillListScreen extends ConsumerWidget {
   const MainBillListScreen({super.key});
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,12 +47,59 @@ class MainBillListScreen extends ConsumerWidget {
                 itemCount: bills.length,
                 itemBuilder: (context, index) {
                   final Bill bill = bills[index];
-                  return ListTile(
-                    title: Text('Bill: ${bill.periodStart} - ${bill.periodEnd}'),
-                    subtitle: Text('ID: ${bill.id}'),
-                    onTap: () {
-                      // TODO: Navigate to Bill Summary screen
-                    },
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    elevation: 2,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue.shade100,
+                        child: Icon(
+                          Icons.receipt_long,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                      title: Text(
+                        'Bill Period',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Text(
+                            '${_formatDate(bill.periodStart)} - ${_formatDate(bill.periodEnd)}',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'ID: ${bill.id.substring(bill.id.length - 6)}',
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey.shade400,
+                        size: 16,
+                      ),
+                      onTap: () {
+                        // TODO: Navigate to Bill Summary screen with calculated values
+                        // For now, show a placeholder
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Bill summary coming soon!')),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
