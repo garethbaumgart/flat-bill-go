@@ -1,0 +1,155 @@
+import '../entities/property.dart';
+import '../entities/bill.dart';
+import '../entities/meter_reading.dart';
+import '../entities/tariff.dart';
+import '../entities/tariff_step.dart';
+import '../controllers/property_controller.dart';
+import '../controllers/bill_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class DebugDataSeeder {
+  static Future<void> seedTestData(WidgetRef ref) async {
+    // Seed Property
+    final property = Property(
+      name: 'Sunset Apartments',
+      address: '123 Main Street, Cape Town, 8001',
+    );
+    await ref.read(propertyControllerProvider.notifier).saveProperty(property);
+
+    // Seed Sample Bills
+    final bills = [
+      _createSampleBill(
+        id: 'bill_2024_01',
+        periodStart: DateTime(2024, 1, 1),
+        periodEnd: DateTime(2024, 1, 31),
+        electricityOpen: 12345,
+        electricityClose: 12456,
+        waterOpen: 200,
+        waterClose: 208,
+        sanitationOpen: 200,
+        sanitationClose: 208,
+        electricityTariff: 3.25,
+        waterTariff0to6: 19.75,
+        waterTariff7to15: 32.55,
+        waterTariff16to30: 45.20,
+        sanitationTariff0to6: 24.42,
+        sanitationTariff7to15: 19.54,
+        sanitationTariff16to30: 28.75,
+      ),
+      _createSampleBill(
+        id: 'bill_2024_02',
+        periodStart: DateTime(2024, 2, 1),
+        periodEnd: DateTime(2024, 2, 29),
+        electricityOpen: 12456,
+        electricityClose: 12580,
+        waterOpen: 208,
+        waterClose: 215,
+        sanitationOpen: 208,
+        sanitationClose: 215,
+        electricityTariff: 3.30,
+        waterTariff0to6: 20.10,
+        waterTariff7to15: 33.20,
+        waterTariff16to30: 46.50,
+        sanitationTariff0to6: 24.80,
+        sanitationTariff7to15: 19.90,
+        sanitationTariff16to30: 29.10,
+      ),
+      _createSampleBill(
+        id: 'bill_2024_03',
+        periodStart: DateTime(2024, 3, 1),
+        periodEnd: DateTime(2024, 3, 31),
+        electricityOpen: 12580,
+        electricityClose: 12720,
+        waterOpen: 215,
+        waterClose: 222,
+        sanitationOpen: 215,
+        sanitationClose: 222,
+        electricityTariff: 3.35,
+        waterTariff0to6: 20.45,
+        waterTariff7to15: 33.85,
+        waterTariff16to30: 47.80,
+        sanitationTariff0to6: 25.18,
+        sanitationTariff7to15: 20.26,
+        sanitationTariff16to30: 29.45,
+      ),
+    ];
+
+    // Save all bills
+    for (final bill in bills) {
+      await ref.read(billControllerProvider.notifier).saveBill(bill);
+    }
+  }
+
+  static Bill _createSampleBill({
+    required String id,
+    required DateTime periodStart,
+    required DateTime periodEnd,
+    required int electricityOpen,
+    required int electricityClose,
+    required int waterOpen,
+    required int waterClose,
+    required int sanitationOpen,
+    required int sanitationClose,
+    required double electricityTariff,
+    required double waterTariff0to6,
+    required double waterTariff7to15,
+    required double waterTariff16to30,
+    required double sanitationTariff0to6,
+    required double sanitationTariff7to15,
+    required double sanitationTariff16to30,
+  }) {
+    // Create meter readings
+    final electricityReading = MeterReading(
+      opening: electricityOpen,
+      closing: electricityClose,
+    );
+    final waterReading = MeterReading(
+      opening: waterOpen,
+      closing: waterClose,
+    );
+    final sanitationReading = MeterReading(
+      opening: sanitationOpen,
+      closing: sanitationClose,
+    );
+
+    // Create tariffs
+    final electricityTariffSteps = [
+      TariffStep(upToUnits: electricityReading.unitsUsed, rate: electricityTariff),
+    ];
+    final electricityTariffObj = Tariff(steps: electricityTariffSteps);
+
+    final waterTariffSteps = [
+      TariffStep(upToUnits: 6, rate: waterTariff0to6),
+      TariffStep(upToUnits: 15, rate: waterTariff7to15),
+      TariffStep(upToUnits: 30, rate: waterTariff16to30),
+    ];
+    final waterTariffObj = Tariff(steps: waterTariffSteps);
+
+    final sanitationTariffSteps = [
+      TariffStep(upToUnits: 6, rate: sanitationTariff0to6),
+      TariffStep(upToUnits: 15, rate: sanitationTariff7to15),
+      TariffStep(upToUnits: 30, rate: sanitationTariff16to30),
+    ];
+    final sanitationTariffObj = Tariff(steps: sanitationTariffSteps);
+
+    return Bill(
+      id: id,
+      periodStart: periodStart,
+      periodEnd: periodEnd,
+      electricityReading: electricityReading,
+      waterReading: waterReading,
+      sanitationReading: sanitationReading,
+      electricityTariff: electricityTariffObj,
+      waterTariff: waterTariffObj,
+      sanitationTariff: sanitationTariffObj,
+    );
+  }
+
+  static Future<void> clearAllData(WidgetRef ref) async {
+    // Clear property
+    await ref.read(propertyControllerProvider.notifier).deleteProperty();
+    
+    // Clear bills (this would need to be implemented in the controller)
+    // For now, we'll just clear the property
+  }
+}
