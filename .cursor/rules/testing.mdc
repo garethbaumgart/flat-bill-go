@@ -1,0 +1,102 @@
+## Testing and Quality Assurance
+
+### Test Execution Strategy
+
+- **ALWAYS run tests after making changes to verify functionality**
+- **NEVER run tests again until all compilation errors are resolved**
+- **ALWAYS address all test failures before proceeding with new features**
+- **ALWAYS verify fixes by re-running tests after error resolution**
+
+### Error Resolution Process
+
+1. **Compilation Errors First**
+   - Fix all syntax errors, missing imports, and type issues
+   - Ensure all files compile without errors
+   - Verify no "Can't find" or "The getter isn't defined" errors
+
+2. **Widget Structure Issues**
+   - Fix missing MaterialApp context in tests
+   - Resolve Directionality widget issues
+   - Ensure proper widget tree structure
+
+3. **UI Layout Problems**
+   - Fix RenderFlex overflow issues
+   - Resolve layout constraints and sizing problems
+   - Ensure all UI elements fit within available space
+
+4. **Test Assertion Failures**
+   - Update test expectations to match actual UI text
+   - Fix widget finder issues (IconData, Text widgets)
+   - Ensure test data matches expected application state
+
+### Test Verification Workflow
+
+1. **Run Initial Tests**
+   ```bash
+   flutter test
+   ```
+
+2. **Analyze Error Output**
+   - Identify compilation errors first
+   - Note widget structure issues
+   - List UI layout problems
+   - Document test assertion failures
+
+3. **Fix Errors Systematically**
+   - Address compilation errors first
+   - Fix widget context issues
+   - Resolve layout overflow problems
+   - Update test expectations
+
+4. **Re-run Tests for Verification**
+   ```bash
+   flutter test
+   ```
+
+5. **Repeat Until All Tests Pass**
+   - Continue fixing errors until no failures remain
+   - Verify each fix resolves the intended issue
+   - Ensure no regressions are introduced
+
+### Test Quality Standards
+
+- **Comprehensive Coverage**: Test all major UI components
+- **Realistic Scenarios**: Use actual app data and states
+- **Error Handling**: Test error conditions and edge cases
+- **Navigation Flow**: Verify screen transitions work correctly
+- **User Interactions**: Test buttons, forms, and user inputs
+
+### Automated Testing Integration
+
+- **Pre-commit Testing**: Run tests before committing changes
+- **Continuous Validation**: Use automated test scripts
+- **Error Reporting**: Provide clear error messages and solutions
+- **Test Documentation**: Document test purpose and expected behavior
+
+### Debugging Test Failures
+
+- **Read Error Messages Carefully**: Understand the root cause
+- **Check Widget Tree**: Verify proper widget hierarchy
+- **Validate Test Data**: Ensure test data matches app state
+- **Use Flutter Inspector**: Debug UI layout issues
+- **Test Isolation**: Ensure tests don't interfere with each other
+
+### Best Practices
+
+- **Test-Driven Development**: Write tests before implementing features
+- **Incremental Testing**: Test small changes frequently
+- **Regression Testing**: Ensure new changes don't break existing functionality
+- **Performance Testing**: Monitor for performance regressions
+- **Accessibility Testing**: Verify UI accessibility features
+
+### Error Prevention
+
+- **Static Analysis**: Run `flutter analyze` regularly
+- **Code Review**: Review changes before testing
+- **Consistent Patterns**: Follow established coding patterns
+- **Documentation**: Document complex test scenarios
+- **Version Control**: Commit working tests separately from features
+description:
+globs:
+alwaysApply: false
+---

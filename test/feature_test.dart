@@ -21,7 +21,11 @@ void main() {
     });
 
     testWidgets('Main screen shows property and bills', (WidgetTester tester) async {
-      await tester.pumpWidget(const ProviderScope(child: MainBillListScreen()));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: const ProviderScope(child: MainBillListScreen()),
+        ),
+      );
       await tester.pumpAndSettle();
       
       // Should show property name or placeholder
@@ -30,7 +34,11 @@ void main() {
     });
 
     testWidgets('New Bill screen has all required fields', (WidgetTester tester) async {
-      await tester.pumpWidget(const ProviderScope(child: NewBillScreen()));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: const ProviderScope(child: NewBillScreen()),
+        ),
+      );
       await tester.pumpAndSettle();
       
       // Check for period selection
@@ -74,9 +82,9 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: BillSummaryScreen(
+        MaterialApp(
+          home: ProviderScope(
+            child: BillSummaryScreen(
               bill: testBill,
               electricityCost: 325.0,
               waterCost: 151.1,
@@ -102,7 +110,11 @@ void main() {
     });
 
     testWidgets('Debug button fills test data', (WidgetTester tester) async {
-      await tester.pumpWidget(const ProviderScope(child: NewBillScreen()));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: const ProviderScope(child: NewBillScreen()),
+        ),
+      );
       await tester.pumpAndSettle();
       
       // Find and tap the debug button
@@ -117,7 +129,11 @@ void main() {
     });
 
     testWidgets('Delete functionality shows confirmation dialog', (WidgetTester tester) async {
-      await tester.pumpWidget(const ProviderScope(child: MainBillListScreen()));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: const ProviderScope(child: MainBillListScreen()),
+        ),
+      );
       await tester.pumpAndSettle();
       
       // Look for dismissible widgets (bills)
