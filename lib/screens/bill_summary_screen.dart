@@ -33,7 +33,7 @@ class BillSummaryScreen extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  Future<void> _exportToPDF() async {
+  Future<void> _exportToPDF(BuildContext context) async {
     try {
       // Create PDF document
       final pdf = pw.Document();
@@ -138,7 +138,7 @@ class BillSummaryScreen extends StatelessWidget {
       
       // Get the documents directory
       final directory = await getApplicationDocumentsDirectory();
-      final fileName = 'bill_${bill.id}_${_formatDate(bill.periodStart)}.pdf';
+      final fileName = 'bill_${bill.id}_${bill.periodStart.year}_${bill.periodStart.month.toString().padLeft(2, '0')}_${bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
       final file = File('${directory.path}/$fileName');
       
       // Write PDF to file
@@ -311,7 +311,7 @@ class BillSummaryScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: _exportToPDF,
+                onPressed: () => _exportToPDF(context),
                 icon: const Icon(Icons.picture_as_pdf),
                 label: const Text('Export to PDF'),
                 style: ElevatedButton.styleFrom(
