@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/bill_controller.dart';
 import '../entities/bill.dart';
+import '../entities/meter_reading.dart';
+import '../entities/tariff.dart';
+import '../entities/tariff_step.dart';
+import '../screens/bill_summary_screen.dart';
 
 class NewBillScreen extends ConsumerStatefulWidget {
   const NewBillScreen({super.key});
@@ -64,6 +68,9 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
       setState(() {
         if (isStart) {
           _periodStart = picked;
+          // Set default end date to same day next month - 1 day
+          final DateTime defaultEndDate = DateTime(picked.year, picked.month + 1, picked.day - 1);
+          _periodEnd = defaultEndDate;
         } else {
           _periodEnd = picked;
         }
@@ -84,10 +91,131 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
 
   Future<void> _calculateBill() async {
     if (_formKey.currentState!.validate() && _periodStart != null && _periodEnd != null) {
-      // TODO: Implement bill calculation logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bill calculation coming soon!')),
-      );
+      try {
+        // Parse meter readings
+        final int electricityOpen = int.parse(_electricityOpenController.text);
+        final int electricityClose = int.parse(_electricityCloseController.text);
+        final int waterOpen = int.parse(_waterOpenController.text);
+        final int waterClose = int.parse(_waterCloseController.text);
+        final int sanitationOpen = int.parse(_sanitationOpenController.text);
+        final int sanitationClose = int.parse(_sanitationCloseController.text);
+
+        // Parse tariffs
+        final double electricityTariff = double.parse(_electricityTariffController.text);
+        final double waterTariff0to6 = double.parse(_waterTariff0to6Controller.text);
+        final double waterTariff7to15 = double.parse(_waterTariff7to15Controller.text);
+        final double waterTariff16to30 = double.parse(_waterTariff16to30Controller.text);
+        final double sanitationTariff0to6 = double.parse(_sanitationTariff0to6Controller.text);
+        final double sanitationTariff7to15 = double.parse(_sanitationTariff7to15Controller.text);
+        final double sanitationTariff16to30 = double.parse(_sanitationTariff16to30Controller.text);
+
+        // Calculate units used
+        final int electricityUnits = electricityClose - electricityOpen;
+        final int waterUnits = waterClose - waterOpen;
+        final int sanitationUnits = sanitationClose - sanitationOpen;
+
+        // Calculate costs with sliding scale
+        final double electricityCost = electricityUnits * electricityTariff;
+        
+        // Water sliding scale calculation
+        double waterCost = 0;
+        int remainingUnits = waterUnits;
+        if (remainingUnits > 0) {
+          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+          waterCost += firstTier * waterTariff0to6;
+          remainingUnits -= firstTier;
+        }
+        if (remainingUnits > 0) {
+          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+          waterCost += secondTier * waterTariff7to15;
+          remainingUnits -= secondTier;
+        }
+        if (remainingUnits > 0) {
+          waterCost += remainingUnits * waterTariff16to30;
+        }
+
+        // Sanitation sliding scale calculation
+        double sanitationCost = 0;
+        remainingUnits = sanitationUnits;
+        if (remainingUnits > 0) {
+          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+          sanitationCost += firstTier * sanitationTariff0to6;
+          remainingUnits -= firstTier;
+        }
+        if (remainingUnits > 0) {
+          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+          sanitationCost += secondTier * sanitationTariff7to15;
+          remainingUnits -= secondTier;
+        }
+        if (remainingUnits > 0) {
+          sanitationCost += remainingUnits * sanitationTariff16to30;
+        }
+
+        // Calculate totals
+        final double subtotal = electricityCost + waterCost + sanitationCost;
+        final double vat = subtotal * 0.15; // 15% VAT
+        final double total = subtotal + vat;
+
+        // Create meter readings
+        final electricityReading = MeterReading(opening: electricityOpen, closing: electricityClose);
+        final waterReading = MeterReading(opening: waterOpen, closing: waterClose);
+        final sanitationReading = MeterReading(opening: sanitationOpen, closing: sanitationClose);
+
+        // Create tariffs
+        final electricityTariffSteps = [TariffStep(upToUnits: electricityUnits, rate: electricityTariff)];
+        final electricityTariffObj = Tariff(steps: electricityTariffSteps);
+        
+        final waterTariffSteps = [
+          TariffStep(upToUnits: 6, rate: waterTariff0to6),
+          TariffStep(upToUnits: 15, rate: waterTariff7to15),
+          TariffStep(upToUnits: 30, rate: waterTariff16to30),
+        ];
+        final waterTariffObj = Tariff(steps: waterTariffSteps);
+        
+        final sanitationTariffSteps = [
+          TariffStep(upToUnits: 6, rate: sanitationTariff0to6),
+          TariffStep(upToUnits: 15, rate: sanitationTariff7to15),
+          TariffStep(upToUnits: 30, rate: sanitationTariff16to30),
+        ];
+        final sanitationTariffObj = Tariff(steps: sanitationTariffSteps);
+
+        // Create bill
+        final bill = Bill(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          periodStart: _periodStart!,
+          periodEnd: _periodEnd!,
+          electricityReading: electricityReading,
+          waterReading: waterReading,
+          sanitationReading: sanitationReading,
+          electricityTariff: electricityTariffObj,
+          waterTariff: waterTariffObj,
+          sanitationTariff: sanitationTariffObj,
+        );
+
+        // Save bill
+        await ref.read(billControllerProvider.notifier).saveBill(bill);
+
+        // Navigate to bill summary
+        if (mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => BillSummaryScreen(
+                bill: bill,
+                electricityCost: electricityCost,
+                waterCost: waterCost,
+                sanitationCost: sanitationCost,
+                subtotal: subtotal,
+                vat: vat,
+                total: total,
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error calculating bill: $e')),
+        );
+      }
     } else if (_periodStart == null || _periodEnd == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select both start and end dates')),
