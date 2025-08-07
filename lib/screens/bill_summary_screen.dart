@@ -59,19 +59,19 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
                 pw.SizedBox(height: 20),
                 
                 // Period
-                pw.Text('Billing Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)}'),
+                pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
                 pw.SizedBox(height: 20),
                 
                 // Simple bill details
-                pw.Text('Electricity: ${_formatCurrency(electricityCost)}'),
-                pw.Text('Water: ${_formatCurrency(waterCost)}'),
-                pw.Text('Sanitation: ${_formatCurrency(sanitationCost)}'),
+                pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
+                pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
+                pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
                 pw.SizedBox(height: 20),
                 
                 // Totals
-                pw.Text('Subtotal: ${_formatCurrency(subtotal)}'),
-                pw.Text('VAT (15%): ${_formatCurrency(vat)}'),
-                pw.Text('Total: ${_formatCurrency(total)}', style: pw.TextStyle(fontSize: 16)),
+                pw.Text('Subtotal: ${_formatCurrency(widget.subtotal)}'),
+                pw.Text('VAT (15%): ${_formatCurrency(widget.vat)}'),
+                pw.Text('Total: ${_formatCurrency(widget.total)}', style: pw.TextStyle(fontSize: 16)),
               ],
             );
           },
@@ -82,7 +82,7 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       
       // Get the documents directory
       final directory = await getApplicationDocumentsDirectory();
-      final fileName = 'bill_${bill.id}_${bill.periodStart.year}_${bill.periodStart.month.toString().padLeft(2, '0')}_${bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
+      final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
       final file = File('${directory.path}/$fileName');
       
       print('🔧 Debug: Saving PDF to ${file.path}');

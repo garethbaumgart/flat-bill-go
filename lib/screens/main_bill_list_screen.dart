@@ -124,7 +124,7 @@ class MainBillListScreen extends ConsumerWidget {
                       }
                     },
                     child: Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     elevation: 2,
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
@@ -241,8 +241,9 @@ class MainBillListScreen extends ConsumerWidget {
                         );
                       },
                     ),
-                  );
-                },
+                  ),
+                );
+              },
               );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
