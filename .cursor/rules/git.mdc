@@ -1,0 +1,42 @@
+## Git and Version Control
+
+### Commit Strategy
+
+- **ALWAYS create a commit after each prompted change or feature implementation**
+- Use conventional commit format: `type(scope): description`
+  - Types: feat, fix, docs, style, refactor, test, chore
+  - Examples: `feat: Add PDF export functionality`, `fix: Resolve filename path issue`
+- Include descriptive commit messages that explain what was changed and why
+- Stage all relevant files with `git add .` before committing
+- Use `git status` to verify changes before committing
+- Commit immediately after implementing a feature or fixing an issue
+- Include both the change and the reasoning in the commit message
+- If multiple related changes are made, group them in a single commit
+- Always test the functionality before committing
+- Use `git push` to sync with remote repository when appropriate
+
+### Branch Management
+
+- Use descriptive branch names: `feature/pdf-export`, `fix/bill-calculation`
+- Keep branches focused on single features or fixes
+- Delete feature branches after merging to main
+- Use pull requests for code review when appropriate
+
+### File Organization
+
+- Stage all changes with `git add .` unless specific files need to be excluded
+- Use `.gitignore` to exclude build artifacts and temporary files
+- Keep commit history clean and logical
+- Avoid committing large binary files or sensitive data
+
+### Best Practices
+
+- Commit frequently with small, focused changes
+- Write clear, descriptive commit messages
+- Test changes before committing
+- Review staged changes with `git diff --cached`
+- Use meaningful commit messages that explain the "why" not just the "what"
+description:
+globs:
+alwaysApply: false
+---

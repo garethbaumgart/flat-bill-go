@@ -130,23 +130,6 @@ Generate code, corrections, and refactorings that comply with the basic principl
 - Use the standard widget testing for flutter
 - Use integration tests for each api module.
 
-## Git and Version Control
-
-### Commit Strategy
-
-- **ALWAYS create a commit after each prompted change or feature implementation**
-- Use conventional commit format: `type(scope): description`
-  - Types: feat, fix, docs, style, refactor, test, chore
-  - Examples: `feat: Add PDF export functionality`, `fix: Resolve filename path issue`
-- Include descriptive commit messages that explain what was changed and why
-- Stage all relevant files with `git add .` before committing
-- Use `git status` to verify changes before committing
-- Commit immediately after implementing a feature or fixing an issue
-- Include both the change and the reasoning in the commit message
-- If multiple related changes are made, group them in a single commit
-- Always test the functionality before committing
-- Use `git push` to sync with remote repository when appropriate
-
 Generate code, corrections, and refactorings that comply with the basic principles and nomenclature.
 
 ## Dart General Guidelines

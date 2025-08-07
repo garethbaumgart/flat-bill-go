@@ -1,0 +1,59 @@
+## Development and Debugging
+
+### Error Checking Strategy
+
+- **ALWAYS check for compilation errors before proceeding with any changes**
+- **ALWAYS verify the app builds and runs successfully after making changes**
+- Run `flutter analyze` to check for static analysis issues
+- Run `flutter doctor` to verify Flutter installation and dependencies
+- Check console output for any error messages or warnings
+- Verify hot reload is working properly after changes
+- Test functionality on the target platform (iOS/Android/Web)
+
+### Build and Run Process
+
+- **ALWAYS run `flutter run` after making changes to verify the app works**
+- Check for any compilation errors in the terminal output
+- Verify the app launches successfully on the target device/simulator
+- Test the specific functionality that was just implemented
+- Look for any runtime errors or crashes
+- Check for any UI rendering issues or layout problems
+
+### Error Resolution
+
+- Address compilation errors immediately before proceeding
+- Fix any static analysis warnings or linting issues
+- Resolve any dependency conflicts or missing packages
+- Check for proper imports and file references
+- Verify all required dependencies are added to pubspec.yaml
+- Ensure proper file paths and directory structure
+
+### Testing Strategy
+
+- Test the specific feature or fix that was just implemented
+- Verify the app behaves as expected
+- Check for any regressions in existing functionality
+- Test on multiple platforms if applicable (iOS, Android, Web)
+- Verify hot reload works correctly for rapid iteration
+
+### Debugging Best Practices
+
+- Use `print()` statements for quick debugging (remove before committing)
+- Check Flutter DevTools for performance and debugging information
+- Use breakpoints in IDE for step-by-step debugging
+- Monitor console output for any error messages
+- Test edge cases and error conditions
+- Verify error handling works as expected
+
+### Quality Assurance
+
+- Ensure code follows the project's coding standards
+- Check for any memory leaks or performance issues
+- Verify proper state management and data flow
+- Test user interactions and navigation
+- Ensure proper error messages are displayed to users
+- Check for accessibility issues and usability problems
+description:
+globs:
+alwaysApply: false
+---
