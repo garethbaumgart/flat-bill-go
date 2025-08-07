@@ -124,10 +124,75 @@ class MainBillListScreen extends ConsumerWidget {
                         size: 16,
                       ),
                       onTap: () {
-                        // TODO: Navigate to Bill Summary screen with calculated values
-                        // For now, show a placeholder
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Bill summary coming soon!')),
+                        // Calculate the bill costs for display
+                        final electricityUnits = bill.electricityReading.unitsUsed;
+                        final waterUnits = bill.waterReading.unitsUsed;
+                        final sanitationUnits = bill.sanitationReading.unitsUsed;
+                        
+                        // Get tariff rates from the bill
+                        final electricityTariff = bill.electricityTariff.steps.first.rate;
+                        final waterTariff0to6 = bill.waterTariff.steps[0].rate;
+                        final waterTariff7to15 = bill.waterTariff.steps[1].rate;
+                        final waterTariff16to30 = bill.waterTariff.steps[2].rate;
+                        final sanitationTariff0to6 = bill.sanitationTariff.steps[0].rate;
+                        final sanitationTariff7to15 = bill.sanitationTariff.steps[1].rate;
+                        final sanitationTariff16to30 = bill.sanitationTariff.steps[2].rate;
+                        
+                        // Calculate costs
+                        final double electricityCost = electricityUnits * electricityTariff;
+                        
+                        // Water sliding scale calculation
+                        double waterCost = 0;
+                        int remainingUnits = waterUnits;
+                        if (remainingUnits > 0) {
+                          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+                          waterCost += firstTier * waterTariff0to6;
+                          remainingUnits -= firstTier;
+                        }
+                        if (remainingUnits > 0) {
+                          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+                          waterCost += secondTier * waterTariff7to15;
+                          remainingUnits -= secondTier;
+                        }
+                        if (remainingUnits > 0) {
+                          waterCost += remainingUnits * waterTariff16to30;
+                        }
+                        
+                        // Sanitation sliding scale calculation
+                        double sanitationCost = 0;
+                        remainingUnits = sanitationUnits;
+                        if (remainingUnits > 0) {
+                          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+                          sanitationCost += firstTier * sanitationTariff0to6;
+                          remainingUnits -= firstTier;
+                        }
+                        if (remainingUnits > 0) {
+                          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+                          sanitationCost += secondTier * sanitationTariff7to15;
+                          remainingUnits -= secondTier;
+                        }
+                        if (remainingUnits > 0) {
+                          sanitationCost += remainingUnits * sanitationTariff16to30;
+                        }
+                        
+                        // Calculate totals
+                        final double subtotal = electricityCost + waterCost + sanitationCost;
+                        final double vat = subtotal * 0.15; // 15% VAT
+                        final double total = subtotal + vat;
+                        
+                        // Navigate to Bill Summary screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => BillSummaryScreen(
+                              bill: bill,
+                              electricityCost: electricityCost,
+                              waterCost: waterCost,
+                              sanitationCost: sanitationCost,
+                              subtotal: subtotal,
+                              vat: vat,
+                              total: total,
+                            ),
+                          ),
                         );
                       },
                     ),

@@ -222,9 +222,20 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         // Save bill
         await ref.read(billControllerProvider.notifier).saveBill(bill);
 
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Bill calculated and saved successfully!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+
         // Navigate to bill summary
         if (mounted) {
-          Navigator.of(context).push(
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => BillSummaryScreen(
                 bill: bill,
