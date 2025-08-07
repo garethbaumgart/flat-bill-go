@@ -2,6 +2,9 @@
 
 ### Commit Strategy
 
+- **NEVER execute any git commands until all tests pass successfully**
+- **ALWAYS run `flutter test` before any git operations**
+- **ONLY proceed with git commands after confirming zero test failures**
 - **ALWAYS create a commit after each prompted change or feature implementation**
 - Use conventional commit format: `type(scope): description`
   - Types: feat, fix, docs, style, refactor, test, chore
@@ -31,11 +34,43 @@
 
 ### Best Practices
 
+- **NEVER commit code that fails tests**
+- **ALWAYS run tests before any git operation**
+- **ONLY commit when all tests pass with zero failures**
 - Commit frequently with small, focused changes
 - Write clear, descriptive commit messages
 - Test changes before committing
 - Review staged changes with `git diff --cached`
 - Use meaningful commit messages that explain the "why" not just the "what"
+
+### Testing-Git Integration
+
+- **MANDATORY: Run `flutter test` before any git command**
+- **BLOCK: All git operations if tests fail**
+- **VERIFY: Zero test failures before staging files**
+- **ENSURE: All compilation errors are resolved before git operations**
+- **CONFIRM: All UI tests pass before committing**
+- **VALIDATE: No regression in existing functionality**
+- **CHECK: Both unit tests and widget tests pass**
+- **GUARANTEE: Code quality before version control**
+
+### Git Workflow with Testing
+
+1. **Make Changes** → Implement feature or fix
+2. **Run Tests** → `flutter test` to verify functionality
+3. **Fix Failures** → Address any test failures systematically
+4. **Re-run Tests** → Confirm all tests pass
+5. **Stage Files** → `git add .` only after tests pass
+6. **Commit Changes** → `git commit` with descriptive message
+7. **Push Changes** → `git push` to remote repository
+
+### Error Prevention
+
+- **NEVER skip testing step in git workflow**
+- **ALWAYS verify test results before git operations**
+- **ONLY proceed with git commands on clean test runs**
+- **BLOCK commits with failing tests**
+- **ENSURE code quality before version control**
 description:
 globs:
 alwaysApply: false

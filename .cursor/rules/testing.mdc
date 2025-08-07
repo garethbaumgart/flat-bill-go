@@ -2,6 +2,10 @@
 
 ### Test Execution Strategy
 
+- **ALWAYS check for compilation errors before running tests**
+- **MANDATORY: Run `flutter analyze` before `flutter test`**
+- **NEVER run tests if compilation errors exist**
+- **ALWAYS fix all compilation errors before test execution**
 - **ALWAYS run tests after making changes to verify functionality**
 - **NEVER run tests again until all compilation errors are resolved**
 - **ALWAYS address all test failures before proceeding with new features**
@@ -31,29 +35,45 @@
 
 ### Test Verification Workflow
 
-1. **Run Initial Tests**
+1. **Check Compilation First**
+   ```bash
+   flutter analyze
+   ```
+
+2. **Fix Compilation Errors**
+   - Resolve all syntax errors
+   - Fix missing imports and type issues
+   - Ensure no "Can't find" or "The getter isn't defined" errors
+   - Verify all files compile successfully
+
+3. **Run Tests Only After Clean Compilation**
    ```bash
    flutter test
    ```
 
-2. **Analyze Error Output**
+4. **Analyze Test Error Output**
    - Identify compilation errors first
    - Note widget structure issues
    - List UI layout problems
    - Document test assertion failures
 
-3. **Fix Errors Systematically**
+5. **Fix Errors Systematically**
    - Address compilation errors first
    - Fix widget context issues
    - Resolve layout overflow problems
    - Update test expectations
 
-4. **Re-run Tests for Verification**
+6. **Re-run Compilation Check**
+   ```bash
+   flutter analyze
+   ```
+
+7. **Re-run Tests for Verification**
    ```bash
    flutter test
    ```
 
-5. **Repeat Until All Tests Pass**
+8. **Repeat Until All Tests Pass**
    - Continue fixing errors until no failures remain
    - Verify each fix resolves the intended issue
    - Ensure no regressions are introduced
@@ -91,11 +111,57 @@
 
 ### Error Prevention
 
+- **Compilation First**: Always run `flutter analyze` before tests
 - **Static Analysis**: Run `flutter analyze` regularly
 - **Code Review**: Review changes before testing
 - **Consistent Patterns**: Follow established coding patterns
 - **Documentation**: Document complex test scenarios
 - **Version Control**: Commit working tests separately from features
+- **Pre-flight Checks**: Verify compilation before any test execution
+
+### Compilation Checking Protocol
+
+- **MANDATORY: Run `flutter analyze` before any test execution**
+- **BLOCK: Test execution if compilation errors exist**
+- **VERIFY: Zero compilation errors before running tests**
+- **ENSURE: All syntax errors are resolved before testing**
+- **CONFIRM: All imports are correct and available**
+- **VALIDATE: All type definitions are properly resolved**
+- **CHECK: No "Can't find" or "The getter isn't defined" errors**
+- **GUARANTEE: Clean compilation before test execution**
+
+### Compilation-Test Workflow
+
+1. **Make Changes** → Implement feature or fix
+2. **Check Compilation** → `flutter analyze`
+3. **Fix Compilation Errors** → Resolve all syntax and type issues
+4. **Re-check Compilation** → `flutter analyze` again
+5. **Run Tests** → `flutter test` only after clean compilation
+6. **Fix Test Failures** → Address any test-specific issues
+7. **Re-run Tests** → `flutter test` to verify fixes
+8. **Repeat Until All Pass** → Both compilation and tests clean
+
+### Compilation Error Categories
+
+1. **Syntax Errors**
+   - Missing parentheses, brackets, or braces
+   - Incorrect semicolon placement
+   - Malformed expressions
+
+2. **Import Errors**
+   - Missing import statements
+   - Incorrect import paths
+   - Unresolved package dependencies
+
+3. **Type Errors**
+   - Incorrect type assignments
+   - Missing type definitions
+   - Null safety violations
+
+4. **Widget Errors**
+   - Missing required properties
+   - Incorrect widget tree structure
+   - Context-related issues
 description:
 globs:
 alwaysApply: false
