@@ -52,8 +52,8 @@ class PdfExportGenerator {
           ],
         ),
         build: (pw.Context context) => [
-          // ELECTRICITY Section on its own page
-          _buildUtilitySection(
+          // ELECTRICITY Section (kept together but only moves if needed)
+          _keepTogether(_buildUtilitySection(
             title: 'ELECTRICITY (electricity charged at residential B-tariff)',
             openingReading: bill.electricityReading.opening,
             closingReading: bill.electricityReading.closing,
@@ -64,11 +64,10 @@ class PdfExportGenerator {
             vatAmount: electricityCost * 0.15,
             totalCost: electricityCost,
             isSlidingScale: false,
-          ),
-          pw.NewPage(),
+          )),
 
-          // WATER Section on its own page
-          _buildUtilitySection(
+          // WATER Section (kept together but only moves if needed)
+          _keepTogether(_buildUtilitySection(
             title: 'WATER (water charged on sliding scale)',
             openingReading: bill.waterReading.opening,
             closingReading: bill.waterReading.closing,
@@ -80,11 +79,10 @@ class PdfExportGenerator {
             totalCost: waterCost,
             isSlidingScale: true,
             tariffSteps: bill.waterTariff.steps,
-          ),
-          pw.NewPage(),
+          )),
 
-          // SANITATION Section on its own page with totals after
-          _buildUtilitySection(
+          // SANITATION Section (kept together but only moves if needed)
+          _keepTogether(_buildUtilitySection(
             title: 'SANITATION (sanitation charged on sliding scale)',
             openingReading: bill.sanitationReading.opening,
             closingReading: bill.sanitationReading.closing,
@@ -96,7 +94,7 @@ class PdfExportGenerator {
             totalCost: sanitationCost,
             isSlidingScale: true,
             tariffSteps: bill.sanitationTariff.steps,
-          ),
+          )),
           pw.SizedBox(height: 20),
 
           // Total Utilities Payable
@@ -133,6 +131,17 @@ class PdfExportGenerator {
     );
 
     return pdf;
+  }
+
+  // Helper to keep a widget from splitting across pages by wrapping it in a single-row table
+  static pw.Widget _keepTogether(pw.Widget child) {
+    return pw.Table(
+      border: null,
+      columnWidths: const {0: pw.FlexColumnWidth()},
+      children: [
+        pw.TableRow(children: [child]),
+      ],
+    );
   }
 
   static pw.Widget _buildUtilitySection({
