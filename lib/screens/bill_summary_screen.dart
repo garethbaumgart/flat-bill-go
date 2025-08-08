@@ -4,11 +4,9 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../entities/bill.dart';
 import 'new_bill_screen.dart';
-
-// Platform-specific imports
-import 'dart:io' if (dart.library.html) 'dart:html';
-import 'package:path_provider/path_provider.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:universal_io/io.dart' show File;
+import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 
 
 
