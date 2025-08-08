@@ -6,9 +6,8 @@ import '../entities/bill.dart';
 import 'new_bill_screen.dart';
 
 // Platform-specific imports
-import 'dart:io' if (dart.library.html) 'dart:html';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_html/html.dart' as html;
+import 'dart:typed_data';
+import '../utils/pdf_download_web.dart' if (dart.library.io) '../utils/pdf_download_mobile.dart' as pdf_handler;
 
 
 
@@ -95,51 +94,13 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
       
       // Save PDF bytes
-      final bytes = await pdf.save();
+      final Uint8List bytes = await pdf.save();
       
-      // For web, trigger download using blob
+      // Platform-specific download/save logic
       if (kIsWeb) {
-        print('🔧 Debug: Triggering PDF download for web...');
-        
-        // Create blob and download link for web
-        final blob = html.Blob([bytes], 'application/pdf');
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final anchor = html.AnchorElement(href: url)
-          ..setAttribute('download', fileName)
-          ..click();
-        html.Url.revokeObjectUrl(url);
-        
-        print('🔧 Debug: PDF download triggered successfully');
-        
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('PDF download started: $fileName'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
+        await pdf_handler.downloadPdfWeb(bytes, fileName, context);
       } else {
-        // For mobile platforms, save to file
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/$fileName');
-        
-        print('🔧 Debug: Saving PDF to ${file.path}');
-        
-        await file.writeAsBytes(bytes);
-        
-        print('🔧 Debug: PDF saved successfully');
-        
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('PDF exported successfully to: $fileName'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
+        await pdf_handler.savePdfMobile(bytes, fileName, context);
       }
     } catch (e) {
       print('🔧 Debug: PDF export error: $e');
