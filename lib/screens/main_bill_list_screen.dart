@@ -20,10 +20,29 @@ class MainBillListScreen extends ConsumerWidget {
     final propertyAsync = ref.watch(propertyControllerProvider);
     final billsAsync = ref.watch(billControllerProvider);
 
+    return propertyAsync.when(
+      data: (property) {
+        // If no property exists, show property details screen
+        if (property == null) {
+          return const PropertyDetailsScreen();
+        }
+        
+        // Property exists, show main screen
+        return _buildMainScreen(context, ref, property, billsAsync);
+      },
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => Scaffold(
+        body: Center(child: Text('Error: $err')),
+      ),
+    );
+  }
+
+  Widget _buildMainScreen(BuildContext context, WidgetRef ref, property, AsyncValue<List<Bill>> billsAsync) {
     return Scaffold(
       appBar: AppBar(
-        title: propertyAsync.when(
-          data: (property) => Column(
+        title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -41,9 +60,6 @@ class MainBillListScreen extends ConsumerWidget {
                 ),
             ],
           ),
-          loading: () => const Text('Loading...'),
-          error: (err, stack) => const Text('Error'),
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),

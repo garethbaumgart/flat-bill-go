@@ -9,7 +9,9 @@ import '../entities/tariff_step.dart';
 import '../screens/bill_summary_screen.dart';
 
 class NewBillScreen extends ConsumerStatefulWidget {
-  const NewBillScreen({super.key});
+  final Bill? billToEdit;
+  
+  const NewBillScreen({super.key, this.billToEdit});
 
   @override
   ConsumerState<NewBillScreen> createState() => _NewBillScreenState();
@@ -38,6 +40,43 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
   final _sanitationTariff0to6Controller = TextEditingController();
   final _sanitationTariff7to15Controller = TextEditingController();
   final _sanitationTariff16to30Controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.billToEdit != null) {
+      _populateFormForEdit();
+    }
+  }
+
+  void _populateFormForEdit() {
+    final bill = widget.billToEdit!;
+    
+    // Set dates
+    setState(() {
+      _periodStart = bill.periodStart;
+      _periodEnd = bill.periodEnd;
+    });
+    
+    // Electricity data
+    _electricityOpenController.text = bill.electricityReading.opening.toString();
+    _electricityCloseController.text = bill.electricityReading.closing.toString();
+    _electricityTariffController.text = bill.electricityTariff.steps.first.rate.toString();
+    
+    // Water data
+    _waterOpenController.text = bill.waterReading.opening.toString();
+    _waterCloseController.text = bill.waterReading.closing.toString();
+    _waterTariff0to6Controller.text = bill.waterTariff.steps[0].rate.toString();
+    _waterTariff7to15Controller.text = bill.waterTariff.steps[1].rate.toString();
+    _waterTariff16to30Controller.text = bill.waterTariff.steps[2].rate.toString();
+    
+    // Sanitation data
+    _sanitationOpenController.text = bill.sanitationReading.opening.toString();
+    _sanitationCloseController.text = bill.sanitationReading.closing.toString();
+    _sanitationTariff0to6Controller.text = bill.sanitationTariff.steps[0].rate.toString();
+    _sanitationTariff7to15Controller.text = bill.sanitationTariff.steps[1].rate.toString();
+    _sanitationTariff16to30Controller.text = bill.sanitationTariff.steps[2].rate.toString();
+  }
 
   @override
   void dispose() {
@@ -208,7 +247,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
 
         // Create bill
         final bill = Bill(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: widget.billToEdit?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
           periodStart: _periodStart!,
           periodEnd: _periodEnd!,
           electricityReading: electricityReading,
@@ -225,8 +264,8 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Bill calculated and saved successfully!'),
+            SnackBar(
+              content: Text(widget.billToEdit != null ? 'Bill updated successfully!' : 'Bill calculated and saved successfully!'),
               backgroundColor: Colors.green,
               duration: Duration(seconds: 2),
             ),
@@ -265,7 +304,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Bill'),
+        title: Text(widget.billToEdit != null ? 'Edit Bill' : 'New Bill'),
         actions: [
           // Debug button for pre-filling test data
           IconButton(

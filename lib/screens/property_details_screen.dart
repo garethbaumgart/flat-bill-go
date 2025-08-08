@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/property_controller.dart';
 import '../entities/property.dart';
+import 'main_bill_list_screen.dart';
 
 class PropertyDetailsScreen extends ConsumerStatefulWidget {
   const PropertyDetailsScreen({super.key});
@@ -46,7 +47,12 @@ class _PropertyDetailsScreenState extends ConsumerState<PropertyDetailsScreen> {
       );
       await ref.read(propertyControllerProvider.notifier).saveProperty(property);
       if (mounted) {
-        Navigator.of(context).pop();
+        // Navigate back to main screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const MainBillListScreen(),
+          ),
+        );
       }
     }
   }
@@ -99,9 +105,7 @@ class _PropertyDetailsScreenState extends ConsumerState<PropertyDetailsScreen> {
                           labelText: 'Property Address',
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter an address';
-                          }
+                          // Address is optional, so no validation needed
                           return null;
                         },
                       ),
