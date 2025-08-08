@@ -73,10 +73,10 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
                 pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
                 pw.SizedBox(height: 20),
                 
-                // Simple bill details
-                pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
-                pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
-                pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
+                // Bill details with usage amounts and units
+                pw.Text('Electricity: ${widget.bill.electricityReading.unitsUsed} kWh - ${_formatCurrency(widget.electricityCost)}'),
+                pw.Text('Water: ${widget.bill.waterReading.unitsUsed} kl - ${_formatCurrency(widget.waterCost)}'),
+                pw.Text('Sanitation: ${widget.bill.sanitationReading.unitsUsed} kl - ${_formatCurrency(widget.sanitationCost)}'),
                 pw.SizedBox(height: 20),
                 
                 // Totals
