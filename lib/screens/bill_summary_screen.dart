@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
+import 'new_bill_screen.dart';
+
+
+
+
+
+
 
 class BillSummaryScreen extends StatefulWidget {
   final Bill bill;
@@ -78,30 +86,47 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
         ),
       );
       
-      print('🔧 Debug: PDF document created, getting directory...');
+      print('🔧 Debug: PDF document created, preparing for download...');
       
-      // Get the documents directory
-      final directory = await getApplicationDocumentsDirectory();
+      // Generate filename
       final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
-      final file = File('${directory.path}/$fileName');
       
-      print('🔧 Debug: Saving PDF to ${file.path}');
-      
-      // Write PDF to file
+      // Save PDF bytes
       final bytes = await pdf.save();
-      await file.writeAsBytes(bytes);
       
-      print('🔧 Debug: PDF saved successfully');
-      
-      // Show success message
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('PDF exported successfully to: $fileName'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+      // For web, show message about PDF export
+      if (kIsWeb) {
+        print('🔧 Debug: PDF export not available on web');
+        
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('PDF export is not available on web. Please use mobile app for PDF export.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        // For mobile platforms, save to file
+        final directory = await getApplicationDocumentsDirectory();
+        final file = File('${directory.path}/$fileName');
+        
+        print('🔧 Debug: Saving PDF to ${file.path}');
+        
+        await file.writeAsBytes(bytes);
+        
+        print('🔧 Debug: PDF saved successfully');
+        
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('PDF exported successfully to: $fileName'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
       }
     } catch (e) {
       print('🔧 Debug: PDF export error: $e');
@@ -116,6 +141,18 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       }
     }
   }
+
+  void _editBill(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => NewBillScreen(
+          billToEdit: widget.bill,
+        ),
+      ),
+    );
+  }
+
+
 
   Future<void> _showDeleteDialog(BuildContext context) async {
     return showDialog(
@@ -157,6 +194,11 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       appBar: AppBar(
         title: const Text('Bill Summary'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            onPressed: () => _editBill(context),
+            tooltip: 'Edit Bill',
+          ),
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: () => _showDeleteDialog(context),
