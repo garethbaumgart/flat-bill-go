@@ -6,7 +6,6 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
 import 'new_bill_screen.dart';
-import 'dart:js' as js;
 
 
 
@@ -53,74 +52,15 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       print('🔧 Debug: Starting PDF export...');
       
       if (kIsWeb) {
-        // For web, use JavaScript to create and download PDF
-        print('🔧 Debug: Creating PDF for web...');
-        
-        // Create the PDF content as HTML
-        final htmlContent = '''
-          <html>
-            <head>
-              <title>Bill Summary</title>
-              <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                .header { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-                .section { margin-bottom: 15px; }
-                .row { display: flex; justify-content: space-between; margin: 5px 0; }
-                .total { font-weight: bold; font-size: 18px; margin-top: 20px; }
-              </style>
-            </head>
-            <body>
-              <div class="header">Utility Bill Summary</div>
-              
-              <div class="section">
-                <strong>Billing Period:</strong> ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}
-              </div>
-              
-              <div class="section">
-                <div class="row">
-                  <span>Electricity:</span>
-                  <span>${_formatCurrency(widget.electricityCost)}</span>
-                </div>
-                <div class="row">
-                  <span>Water:</span>
-                  <span>${_formatCurrency(widget.waterCost)}</span>
-                </div>
-                <div class="row">
-                  <span>Sanitation:</span>
-                  <span>${_formatCurrency(widget.sanitationCost)}</span>
-                </div>
-              </div>
-              
-              <div class="section">
-                <div class="row">
-                  <span>Subtotal:</span>
-                  <span>${_formatCurrency(widget.subtotal)}</span>
-                </div>
-                <div class="row">
-                  <span>VAT (15%):</span>
-                  <span>${_formatCurrency(widget.vat)}</span>
-                </div>
-                <div class="row total">
-                  <span>Total:</span>
-                  <span>${_formatCurrency(widget.total)}</span>
-                </div>
-              </div>
-            </body>
-          </html>
-        ''';
-        
-        // Generate filename
-        final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
-        
-        // Use JavaScript to create and download PDF
-        js.context.callMethod('createAndDownloadPDF', [htmlContent, fileName]);
+        // For web, show instructions to use browser print
+        print('🔧 Debug: Showing print instructions for web...');
         
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('PDF downloaded: $fileName'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
+            const SnackBar(
+              content: Text('Please use Ctrl+P (or Cmd+P) to print and save as PDF'),
+              backgroundColor: Colors.blue,
+              duration: Duration(seconds: 5),
             ),
           );
         }
