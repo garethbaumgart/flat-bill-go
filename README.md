@@ -7,7 +7,7 @@ A Flutter app for managing utility bills and property details.
 - 📊 **Bill Management**: Create, view, and manage utility bills
 - 🏠 **Property Details**: Store property information
 - 💰 **Cost Calculation**: Automatic calculation of electricity, water, and sanitation costs
-- 📄 **PDF Export**: Export bills as PDF (mobile only)
+- 📄 **PDF Export**: Export bills as PDF (works on all platforms)
 - 📱 **Cross Platform**: Works on iOS, Android, and Web
 
 ## Live Demo
