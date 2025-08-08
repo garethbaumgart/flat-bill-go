@@ -32,26 +32,27 @@ class PdfExportGenerator {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(40),
-        build: (pw.Context context) => [
-          // Header
-          pw.Text(
-            'UTILITY BILL SUMMARY',
-            style: pw.TextStyle(
-              fontSize: 24,
-              fontWeight: pw.FontWeight.bold,
-              color: PdfColors.blue900,
+        header: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'UTILITY BILL SUMMARY',
+              style: pw.TextStyle(
+                fontSize: 24,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blue900,
+              ),
             ),
-          ),
-          pw.SizedBox(height: 10),
-
-          // Period underneath heading
-          pw.Text(
-            'Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)} ${_formatYear(bill.periodStart)}',
-            style: const pw.TextStyle(fontSize: 14),
-          ),
-          pw.SizedBox(height: 30),
-
-          // ELECTRICITY Section
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)} ${_formatYear(bill.periodStart)}',
+              style: const pw.TextStyle(fontSize: 14),
+            ),
+            pw.SizedBox(height: 16),
+          ],
+        ),
+        build: (pw.Context context) => [
+          // ELECTRICITY Section on its own page
           _buildUtilitySection(
             title: 'ELECTRICITY (electricity charged at residential B-tariff)',
             openingReading: bill.electricityReading.opening,
@@ -64,9 +65,9 @@ class PdfExportGenerator {
             totalCost: electricityCost,
             isSlidingScale: false,
           ),
-          pw.SizedBox(height: 20),
+          pw.NewPage(),
 
-          // WATER Section
+          // WATER Section on its own page
           _buildUtilitySection(
             title: 'WATER (water charged on sliding scale)',
             openingReading: bill.waterReading.opening,
@@ -80,9 +81,9 @@ class PdfExportGenerator {
             isSlidingScale: true,
             tariffSteps: bill.waterTariff.steps,
           ),
-          pw.SizedBox(height: 20),
+          pw.NewPage(),
 
-          // SANITATION Section
+          // SANITATION Section on its own page with totals after
           _buildUtilitySection(
             title: 'SANITATION (sanitation charged on sliding scale)',
             openingReading: bill.sanitationReading.opening,
@@ -96,7 +97,7 @@ class PdfExportGenerator {
             isSlidingScale: true,
             tariffSteps: bill.sanitationTariff.steps,
           ),
-          pw.SizedBox(height: 30),
+          pw.SizedBox(height: 20),
 
           // Total Utilities Payable
           pw.Container(

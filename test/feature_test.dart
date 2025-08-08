@@ -53,6 +53,7 @@ void main() {
       // Create a test bill
       final testBill = Bill(
         id: 'test_bill_1',
+        invoiceNumber: 'INV-TEST-0001',
         periodStart: DateTime(2024, 1, 1),
         periodEnd: DateTime(2024, 1, 31),
         electricityReading: MeterReading(opening: 1000, closing: 1100),
@@ -91,7 +92,8 @@ void main() {
       // Check for basic structure elements
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Bill Summary'), findsOneWidget);
+      // Title may be prefixed by invoice number, so just look for containing text
+      expect(find.textContaining('Bill Summary'), findsOneWidget);
     });
 
     testWidgets('Debug button exists in New Bill screen', (WidgetTester tester) async {
