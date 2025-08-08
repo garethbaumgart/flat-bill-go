@@ -6,6 +6,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
 import 'new_bill_screen.dart';
+import 'dart:convert';
+import 'package:universal_html/html.dart' as html;
 
 
 
@@ -52,15 +54,68 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       print('🔧 Debug: Starting PDF export...');
       
       if (kIsWeb) {
-        // For web, show instructions to use browser print
-        print('🔧 Debug: Showing print instructions for web...');
+        // For web, create a simple PDF using the pdf package
+        print('🔧 Debug: Creating PDF for web...');
+        
+        // Create PDF document
+        final pdf = pw.Document();
+        
+        // Add page to PDF
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            build: (pw.Context context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 20),
+                  
+                  // Period
+                  pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
+                  pw.SizedBox(height: 20),
+                  
+                  // Bill details
+                  pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
+                  pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
+                  pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
+                  pw.SizedBox(height: 20),
+                  
+                  // Totals
+                  pw.Text('Subtotal: ${_formatCurrency(widget.subtotal)}'),
+                  pw.Text('VAT (15%): ${_formatCurrency(widget.vat)}'),
+                  pw.Text('Total: ${_formatCurrency(widget.total)}', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                ],
+              );
+            },
+          ),
+        );
+        
+        // Generate filename
+        final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
+        
+        // Save PDF bytes
+        final bytes = await pdf.save();
+        
+        // For web, trigger download using universal_html
+        print('🔧 Debug: Triggering web download...');
         
         if (context.mounted) {
+          // Create blob and download the PDF using universal_html
+          final blob = html.Blob([bytes], 'application/pdf');
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          final anchor = html.AnchorElement(href: url)
+            ..setAttribute('download', fileName)
+            ..click();
+          html.Url.revokeObjectUrl(url);
+          
+          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please use Ctrl+P (or Cmd+P) to print and save as PDF'),
-              backgroundColor: Colors.blue,
-              duration: Duration(seconds: 5),
+            SnackBar(
+              content: Text('PDF downloaded: $fileName'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
             ),
           );
         }
