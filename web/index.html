@@ -31,8 +31,36 @@
 
   <title>flat_bill_go</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- PDF generation library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  
+  <script>
+    // Function to create and download PDF
+    function createAndDownloadPDF(htmlContent, fileName) {
+      // Create a temporary div with the HTML content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      document.body.appendChild(tempDiv);
+      
+      // Configure PDF options
+      const opt = {
+        margin: 1,
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // Generate and download PDF
+      html2pdf().set(opt).from(tempDiv).save().then(() => {
+        // Remove the temporary div
+        document.body.removeChild(tempDiv);
+      });
+    }
+  </script>
 </body>
 </html>

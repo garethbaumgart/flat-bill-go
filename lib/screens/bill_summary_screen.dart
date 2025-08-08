@@ -6,6 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
 import 'new_bill_screen.dart';
+import 'dart:js' as js;
 
 
 
@@ -51,63 +52,123 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
     try {
       print('🔧 Debug: Starting PDF export...');
       
-      // Create PDF document
-      final pdf = pw.Document();
-      
-      // Add page to PDF with simpler content
-      pdf.addPage(
-        pw.Page(
-          pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // Simple header
-                pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 20)),
-                pw.SizedBox(height: 20),
-                
-                // Period
-                pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
-                pw.SizedBox(height: 20),
-                
-                // Simple bill details
-                pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
-                pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
-                pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
-                pw.SizedBox(height: 20),
-                
-                // Totals
-                pw.Text('Subtotal: ${_formatCurrency(widget.subtotal)}'),
-                pw.Text('VAT (15%): ${_formatCurrency(widget.vat)}'),
-                pw.Text('Total: ${_formatCurrency(widget.total)}', style: pw.TextStyle(fontSize: 16)),
-              ],
-            );
-          },
-        ),
-      );
-      
-      print('🔧 Debug: PDF document created, preparing for download...');
-      
-      // Generate filename
-      final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
-      
-      // Save PDF bytes
-      final bytes = await pdf.save();
-      
-      // For web, show message about PDF export
       if (kIsWeb) {
-        print('🔧 Debug: PDF export not available on web');
+        // For web, use JavaScript to create and download PDF
+        print('🔧 Debug: Creating PDF for web...');
+        
+        // Create the PDF content as HTML
+        final htmlContent = '''
+          <html>
+            <head>
+              <title>Bill Summary</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+                .section { margin-bottom: 15px; }
+                .row { display: flex; justify-content: space-between; margin: 5px 0; }
+                .total { font-weight: bold; font-size: 18px; margin-top: 20px; }
+              </style>
+            </head>
+            <body>
+              <div class="header">Utility Bill Summary</div>
+              
+              <div class="section">
+                <strong>Billing Period:</strong> ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}
+              </div>
+              
+              <div class="section">
+                <div class="row">
+                  <span>Electricity:</span>
+                  <span>${_formatCurrency(widget.electricityCost)}</span>
+                </div>
+                <div class="row">
+                  <span>Water:</span>
+                  <span>${_formatCurrency(widget.waterCost)}</span>
+                </div>
+                <div class="row">
+                  <span>Sanitation:</span>
+                  <span>${_formatCurrency(widget.sanitationCost)}</span>
+                </div>
+              </div>
+              
+              <div class="section">
+                <div class="row">
+                  <span>Subtotal:</span>
+                  <span>${_formatCurrency(widget.subtotal)}</span>
+                </div>
+                <div class="row">
+                  <span>VAT (15%):</span>
+                  <span>${_formatCurrency(widget.vat)}</span>
+                </div>
+                <div class="row total">
+                  <span>Total:</span>
+                  <span>${_formatCurrency(widget.total)}</span>
+                </div>
+              </div>
+            </body>
+          </html>
+        ''';
+        
+        // Generate filename
+        final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
+        
+        // Use JavaScript to create and download PDF
+        js.context.callMethod('createAndDownloadPDF', [htmlContent, fileName]);
         
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF export is not available on web. Please use mobile app for PDF export.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 3),
+            SnackBar(
+              content: Text('PDF downloaded: $fileName'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
             ),
           );
         }
       } else {
+        // For mobile platforms, create and save PDF file
+        // Create PDF document
+        final pdf = pw.Document();
+        
+        // Add page to PDF with simpler content
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            build: (pw.Context context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Simple header
+                  pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 20)),
+                  pw.SizedBox(height: 20),
+                  
+                  // Period
+                  pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
+                  pw.SizedBox(height: 20),
+                  
+                  // Simple bill details
+                  pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
+                  pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
+                  pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
+                  pw.SizedBox(height: 20),
+                  
+                  // Totals
+                  pw.Text('Subtotal: ${_formatCurrency(widget.subtotal)}'),
+                  pw.Text('VAT (15%): ${_formatCurrency(widget.vat)}'),
+                  pw.Text('Total: ${_formatCurrency(widget.total)}', style: pw.TextStyle(fontSize: 16)),
+                ],
+              );
+            },
+          ),
+        );
+        
+        print('🔧 Debug: PDF document created, preparing for download...');
+        
+        // Generate filename
+        final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
+        
+        // Save PDF bytes
+        final bytes = await pdf.save();
+        
         // For mobile platforms, save to file
         final directory = await getApplicationDocumentsDirectory();
         final file = File('${directory.path}/$fileName');
@@ -478,5 +539,18 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
         ],
       ),
     );
+  }
+
+  void _triggerPrintDialog() {
+    if (kIsWeb) {
+      // For web, show instructions to use browser's print function
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please use Ctrl+P (or Cmd+P) to print and save as PDF.'),
+          backgroundColor: Colors.blue,
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
   }
 }
