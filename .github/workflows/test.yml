@@ -3,6 +3,7 @@ name: Test
 on:
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:
@@ -16,9 +17,13 @@ jobs:
       with:
         flutter-version: '3.32.8'
         channel: 'stable'
+        cache: true
     
     - name: Install dependencies
       run: flutter pub get
+    
+    - name: Verify formatting
+      run: flutter format --dry-run --set-exit-if-changed .
     
     - name: Analyze code
       run: flutter analyze
