@@ -5,8 +5,6 @@ import 'package:pdf/widgets.dart' as pw;
 import '../entities/bill.dart';
 import 'new_bill_screen.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:universal_io/io.dart' show File;
-import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 
 
 
@@ -120,21 +118,15 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
         }
       } else {
         // For mobile platforms, save to file
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/$fileName');
-        
-        print('🔧 Debug: Saving PDF to ${file.path}');
-        
-        await file.writeAsBytes(bytes);
-        
-        print('🔧 Debug: PDF saved successfully');
+        // TODO: Re-implement mobile file saving without import conflicts
+        print('🔧 Debug: Mobile file saving temporarily disabled');
         
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('PDF exported successfully to: $fileName'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
+            const SnackBar(
+              content: Text('PDF export only available on web for now'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
             ),
           );
         }
