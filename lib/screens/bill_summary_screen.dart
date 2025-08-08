@@ -8,6 +8,7 @@ import '../entities/bill.dart';
 import 'new_bill_screen.dart';
 import 'dart:convert';
 import 'package:universal_html/html.dart' as html;
+import '../utils/pdf_export_generator.dart';
 
 
 
@@ -53,51 +54,26 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
     try {
       print('🔧 Debug: Starting PDF export...');
       
+      // Generate detailed PDF using the new generator
+      final pdf = PdfExportGenerator.generateDetailedBillPdf(
+        bill: widget.bill,
+        electricityCost: widget.electricityCost,
+        waterCost: widget.waterCost,
+        sanitationCost: widget.sanitationCost,
+        subtotal: widget.subtotal,
+        vat: widget.vat,
+        total: widget.total,
+      );
+      
+      // Generate filename
+      final fileName = widget.bill.invoiceNumber.isNotEmpty 
+          ? '${widget.bill.invoiceNumber}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf'
+          : 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
+      
+      // Save PDF bytes
+      final bytes = await pdf.save();
+      
       if (kIsWeb) {
-        // For web, create a simple PDF using the pdf package
-        print('🔧 Debug: Creating PDF for web...');
-        
-        // Create PDF document
-        final pdf = pw.Document();
-        
-        // Add page to PDF
-        pdf.addPage(
-          pw.Page(
-            pageFormat: PdfPageFormat.a4,
-            build: (pw.Context context) {
-              return pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
-                  pw.SizedBox(height: 20),
-                  
-                  // Period
-                  pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
-                  pw.SizedBox(height: 20),
-                  
-                  // Bill details
-                  pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
-                  pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
-                  pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
-                  pw.SizedBox(height: 20),
-                  
-                  // Totals
-                  pw.Text('Subtotal: ${_formatCurrency(widget.subtotal)}'),
-                  pw.Text('VAT (15%): ${_formatCurrency(widget.vat)}'),
-                  pw.Text('Total: ${_formatCurrency(widget.total)}', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                ],
-              );
-            },
-          ),
-        );
-        
-        // Generate filename
-        final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
-        
-        // Save PDF bytes
-        final bytes = await pdf.save();
-        
         // For web, trigger download using universal_html
         print('🔧 Debug: Triggering web download...');
         
@@ -120,49 +96,8 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
           );
         }
       } else {
-        // For mobile platforms, create and save PDF file
-        // Create PDF document
-        final pdf = pw.Document();
-        
-        // Add page to PDF with simpler content
-        pdf.addPage(
-          pw.Page(
-            pageFormat: PdfPageFormat.a4,
-            build: (pw.Context context) {
-              return pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  // Simple header
-                  pw.Text('Utility Bill Summary', style: pw.TextStyle(fontSize: 20)),
-                  pw.SizedBox(height: 20),
-                  
-                  // Period
-                  pw.Text('Billing Period: ${_formatDate(widget.bill.periodStart)} to ${_formatDate(widget.bill.periodEnd)}'),
-                  pw.SizedBox(height: 20),
-                  
-                  // Simple bill details
-                  pw.Text('Electricity: ${_formatCurrency(widget.electricityCost)}'),
-                  pw.Text('Water: ${_formatCurrency(widget.waterCost)}'),
-                  pw.Text('Sanitation: ${_formatCurrency(widget.sanitationCost)}'),
-                  pw.SizedBox(height: 20),
-                  
-                  // Totals
-                  pw.Text('Subtotal: ${_formatCurrency(widget.subtotal)}'),
-                  pw.Text('VAT (15%): ${_formatCurrency(widget.vat)}'),
-                  pw.Text('Total: ${_formatCurrency(widget.total)}', style: pw.TextStyle(fontSize: 16)),
-                ],
-              );
-            },
-          ),
-        );
-        
+        // For mobile platforms, save to file
         print('🔧 Debug: PDF document created, preparing for download...');
-        
-        // Generate filename
-        final fileName = 'bill_${widget.bill.id}_${widget.bill.periodStart.year}_${widget.bill.periodStart.month.toString().padLeft(2, '0')}_${widget.bill.periodStart.day.toString().padLeft(2, '0')}.pdf';
-        
-        // Save PDF bytes
-        final bytes = await pdf.save();
         
         // For mobile platforms, save to file
         final directory = await getApplicationDocumentsDirectory();
@@ -248,7 +183,7 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bill Summary'),
+        title: Text(widget.bill.invoiceNumber.isNotEmpty ? '${widget.bill.invoiceNumber} - Bill Summary' : 'Bill Summary'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.blue),

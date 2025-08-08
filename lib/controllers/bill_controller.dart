@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../entities/bill.dart';
 import '../repositories/bill_repository.dart';
 import '../repositories/impl/bill_repository_impl.dart';
+import '../utils/invoice_number_generator.dart';
 
 final billRepositoryProvider = Provider<BillRepository>((ref) => BillRepositoryImpl());
 
@@ -17,7 +18,25 @@ class BillController extends AsyncNotifier<List<Bill>> {
   }
 
   Future<void> saveBill(Bill bill) async {
-    await _repository.saveBill(bill);
+    // Generate invoice number if not already set
+    Bill billToSave = bill;
+    if (bill.invoiceNumber.isEmpty || bill.invoiceNumber == 'INV-0001') {
+      final invoiceNumber = await InvoiceNumberGenerator.generateNextInvoiceNumber();
+      billToSave = Bill(
+        id: bill.id,
+        invoiceNumber: invoiceNumber,
+        periodStart: bill.periodStart,
+        periodEnd: bill.periodEnd,
+        electricityReading: bill.electricityReading,
+        waterReading: bill.waterReading,
+        sanitationReading: bill.sanitationReading,
+        electricityTariff: bill.electricityTariff,
+        waterTariff: bill.waterTariff,
+        sanitationTariff: bill.sanitationTariff,
+      );
+    }
+    
+    await _repository.saveBill(billToSave);
     state = AsyncValue.data(await _repository.listBills());
   }
 

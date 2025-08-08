@@ -152,7 +152,7 @@ class MainBillListScreen extends ConsumerWidget {
                         ),
                       ),
                       title: Text(
-                        'Bill Period',
+                        bill.invoiceNumber.isNotEmpty ? bill.invoiceNumber : 'Bill Period',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,

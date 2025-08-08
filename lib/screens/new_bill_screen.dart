@@ -7,6 +7,7 @@ import '../entities/meter_reading.dart';
 import '../entities/tariff.dart';
 import '../entities/tariff_step.dart';
 import '../screens/bill_summary_screen.dart';
+import '../utils/invoice_number_generator.dart';
 
 class NewBillScreen extends ConsumerStatefulWidget {
   final Bill? billToEdit;
@@ -246,8 +247,10 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         final sanitationTariffObj = Tariff(steps: sanitationTariffSteps);
 
         // Create bill
+        final invoiceNumber = await InvoiceNumberGenerator.generateNextInvoiceNumber();
         final bill = Bill(
           id: widget.billToEdit?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+          invoiceNumber: widget.billToEdit?.invoiceNumber ?? invoiceNumber,
           periodStart: _periodStart!,
           periodEnd: _periodEnd!,
           electricityReading: electricityReading,
