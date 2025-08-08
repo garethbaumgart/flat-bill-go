@@ -38,3 +38,7 @@ windows/build/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Downloaded files
+*.tar.xz
+*.tar.gz
