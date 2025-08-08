@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
 import 'new_bill_screen.dart';
+
+// Platform-specific imports
+import 'dart:io' if (dart.library.html) 'dart:html';
+import 'package:path_provider/path_provider.dart';
+import 'package:universal_html/html.dart' as html;
 
 
 
@@ -94,16 +97,26 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
       // Save PDF bytes
       final bytes = await pdf.save();
       
-      // For web, show message about PDF export
+      // For web, trigger download using blob
       if (kIsWeb) {
-        print('🔧 Debug: PDF export not available on web');
+        print('🔧 Debug: Triggering PDF download for web...');
+        
+        // Create blob and download link for web
+        final blob = html.Blob([bytes], 'application/pdf');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', fileName)
+          ..click();
+        html.Url.revokeObjectUrl(url);
+        
+        print('🔧 Debug: PDF download triggered successfully');
         
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF export is not available on web. Please use mobile app for PDF export.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 3),
+            SnackBar(
+              content: Text('PDF download started: $fileName'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
             ),
           );
         }
