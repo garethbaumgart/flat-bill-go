@@ -94,7 +94,7 @@ class _PropertyDetailsScreenState extends ConsumerState<PropertyDetailsScreen> {
       appBar: AppBar(
         title: const Text('Property Details'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
