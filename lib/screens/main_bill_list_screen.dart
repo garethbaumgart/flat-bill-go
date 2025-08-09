@@ -170,13 +170,7 @@ class MainBillListScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Text(
-                            'ID: ${bill.id.substring(bill.id.length - 6)}',
-                            style: TextStyle(
-                              color: Colors.grey.shade500,
-                              fontSize: 12,
-                            ),
-                          ),
+                          // Removed ID from display to reduce clutter
                         ],
                       ),
                       trailing: Icon(
