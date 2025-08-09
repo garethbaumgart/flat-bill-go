@@ -354,7 +354,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                   const SnackBar(content: Text('Property defaults loaded!')),
                 );
               },
-              tooltip: 'Load Property Defaults',
+              tooltip: 'Load Default Tariff Rates',
             ),
           if (!kReleaseMode)
             IconButton(
