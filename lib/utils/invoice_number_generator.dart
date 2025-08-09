@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class InvoiceNumberGenerator {
   static const String _key = 'last_invoice_number';
-  static const String _prefix = 'INV-';
+  static const String _prefix = 'UTIL-';
   
   /// Generates the next invoice number in the format INV-0001, INV-0002, etc.
   static Future<String> generateNextInvoiceNumber() async {
@@ -42,10 +42,15 @@ class InvoiceNumberGenerator {
   /// Parses an invoice number like INV-0123 into its numeric part (e.g., 123).
   /// Returns null if the format is invalid.
   static int? parseInvoiceNumber(String invoiceNumber) {
-    if (!invoiceNumber.startsWith(_prefix)) return null;
-    final digits = invoiceNumber.substring(_prefix.length);
-    final value = int.tryParse(digits);
-    return value;
+    // Accept legacy prefixes too so we keep monotonicity if data contains old invoices
+    const prefixes = ['UTIL-', 'INV-'];
+    for (final p in prefixes) {
+      if (invoiceNumber.startsWith(p)) {
+        final digits = invoiceNumber.substring(p.length);
+        return int.tryParse(digits);
+      }
+    }
+    return null;
   }
 }
 

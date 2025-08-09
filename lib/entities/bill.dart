@@ -41,7 +41,7 @@ class Bill {
   
   factory Bill.fromJson(Map<String, dynamic> json) => Bill(
     id: json['id'],
-    invoiceNumber: json['invoiceNumber'] ?? 'INV-0001', // Default for backward compatibility
+    invoiceNumber: json['invoiceNumber'] ?? 'UTIL-0001', // Default for backward compatibility
     periodStart: DateTime.parse(json['periodStart']),
     periodEnd: DateTime.parse(json['periodEnd']),
     electricityReading: MeterReading.fromJson(json['electricityReading']),

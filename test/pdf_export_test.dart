@@ -16,7 +16,7 @@ void main() {
       // Create a test bill for all tests
       testBill = Bill(
         id: 'test_bill_1',
-        invoiceNumber: 'INV-TEST-0001',
+        invoiceNumber: 'UTIL-TEST-0001',
         periodStart: DateTime(2024, 1, 1),
         periodEnd: DateTime(2024, 1, 31),
         electricityReading: MeterReading(opening: 1000, closing: 1100),

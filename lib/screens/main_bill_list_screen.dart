@@ -88,6 +88,8 @@ class MainBillListScreen extends ConsumerWidget {
       body: billsAsync.when(
         data: (bills) {
           print('🔧 Debug: Main screen loaded ${bills.length} bills');
+          // Sort bills so most recent periodEnd first
+          bills.sort((a, b) => b.periodEnd.compareTo(a.periodEnd));
           return bills.isEmpty
               ? const Center(child: Text('(No bills yet)'))
               : ListView.builder(
