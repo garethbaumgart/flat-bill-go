@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/bill_controller.dart';
 import '../controllers/property_controller.dart';
@@ -355,17 +356,17 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
               },
               tooltip: 'Load Property Defaults',
             ),
-          // Debug button for pre-filling test data
-          IconButton(
-            icon: const Icon(Icons.bug_report),
-            onPressed: () {
-              _fillTestData();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Test data filled!')),
-              );
-            },
-            tooltip: 'Fill Test Data (Debug)',
-          ),
+          if (!kReleaseMode)
+            IconButton(
+              icon: const Icon(Icons.bug_report),
+              onPressed: () {
+                _fillTestData();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Test data filled!')),
+                );
+              },
+              tooltip: 'Fill Test Data (Debug)',
+            ),
         ],
       ),
       body: Form(

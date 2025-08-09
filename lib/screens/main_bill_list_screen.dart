@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/property_controller.dart';
 import '../controllers/bill_controller.dart';
 import '../entities/bill.dart';
-import '../utils/debug_data_seeder.dart';
+import '../utils/debug_data_seeder.dart' as debug_seeder;
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'property_details_screen.dart';
 import 'new_bill_screen.dart';
 import 'bill_summary_screen.dart';
@@ -72,17 +73,17 @@ class MainBillListScreen extends ConsumerWidget {
             },
             tooltip: 'Edit Property Details',
           ),
-          // Debug button for seeding test data
-          IconButton(
-            icon: const Icon(Icons.bug_report),
-            onPressed: () async {
-              await DebugDataSeeder.seedTestData(ref);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Test data seeded successfully!')),
-              );
-            },
-            tooltip: 'Seed Test Data (Debug)',
-          ),
+          if (!kReleaseMode)
+            IconButton(
+              icon: const Icon(Icons.bug_report),
+              onPressed: () async {
+                await debug_seeder.DebugDataSeeder.seedTestData(ref);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Test data seeded successfully!')),
+                );
+              },
+              tooltip: 'Seed Test Data (Debug)',
+            ),
         ],
       ),
       body: billsAsync.when(

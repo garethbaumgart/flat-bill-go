@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
+import '../controllers/bill_controller.dart';
 import 'new_bill_screen.dart';
 import 'dart:convert';
 import 'package:universal_html/html.dart' as html;
@@ -16,7 +18,7 @@ import '../utils/pdf_export_generator.dart';
 
 
 
-class BillSummaryScreen extends StatefulWidget {
+class BillSummaryScreen extends ConsumerStatefulWidget {
   final Bill bill;
   final double electricityCost;
   final double waterCost;
@@ -37,10 +39,10 @@ class BillSummaryScreen extends StatefulWidget {
   });
 
   @override
-  State<BillSummaryScreen> createState() => _BillSummaryScreenState();
+  ConsumerState<BillSummaryScreen> createState() => _BillSummaryScreenState();
 }
 
-class _BillSummaryScreenState extends State<BillSummaryScreen> {
+class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
 
   String _formatCurrency(double amount) {
     return 'R${amount.toStringAsFixed(2)}';
@@ -158,15 +160,19 @@ class _BillSummaryScreenState extends State<BillSummaryScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                // Close the dialog
                 Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Go back to main screen
-                // Note: We'll need to implement the actual deletion here
-                // For now, just show a message
+                // Perform deletion via controller
+                await ref.read(billControllerProvider.notifier).deleteBill(widget.bill.id);
+                if (!mounted) return;
+                // Navigate back to the list
+                Navigator.of(context).pop();
+                // Notify
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Delete functionality will be implemented'),
-                    backgroundColor: Colors.orange,
+                    content: Text('Bill deleted successfully'),
+                    backgroundColor: Colors.green,
                   ),
                 );
               },
