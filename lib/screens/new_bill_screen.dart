@@ -56,28 +56,30 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
   void _loadPropertyDefaults() async {
     final propertyAsync = ref.read(propertyControllerProvider);
     propertyAsync.whenData((property) {
-      if (property != null) {
-        if (property.defaultElectricityRate != null) {
-          _electricityTariffController.text = property.defaultElectricityRate.toString();
-        }
-        if (property.defaultWaterRate0to6 != null) {
-          _waterTariff0to6Controller.text = property.defaultWaterRate0to6.toString();
-        }
-        if (property.defaultWaterRate7to15 != null) {
-          _waterTariff7to15Controller.text = property.defaultWaterRate7to15.toString();
-        }
-        if (property.defaultWaterRate16to30 != null) {
-          _waterTariff16to30Controller.text = property.defaultWaterRate16to30.toString();
-        }
-        if (property.defaultSanitationRate0to6 != null) {
-          _sanitationTariff0to6Controller.text = property.defaultSanitationRate0to6.toString();
-        }
-        if (property.defaultSanitationRate7to15 != null) {
-          _sanitationTariff7to15Controller.text = property.defaultSanitationRate7to15.toString();
-        }
-        if (property.defaultSanitationRate16to30 != null) {
-          _sanitationTariff16to30Controller.text = property.defaultSanitationRate16to30.toString();
-        }
+      if (property != null && mounted) {
+        setState(() {
+          if (property.defaultElectricityRate != null) {
+            _electricityTariffController.text = property.defaultElectricityRate.toString();
+          }
+          if (property.defaultWaterRate0to6 != null) {
+            _waterTariff0to6Controller.text = property.defaultWaterRate0to6.toString();
+          }
+          if (property.defaultWaterRate7to15 != null) {
+            _waterTariff7to15Controller.text = property.defaultWaterRate7to15.toString();
+          }
+          if (property.defaultWaterRate16to30 != null) {
+            _waterTariff16to30Controller.text = property.defaultWaterRate16to30.toString();
+          }
+          if (property.defaultSanitationRate0to6 != null) {
+            _sanitationTariff0to6Controller.text = property.defaultSanitationRate0to6.toString();
+          }
+          if (property.defaultSanitationRate7to15 != null) {
+            _sanitationTariff7to15Controller.text = property.defaultSanitationRate7to15.toString();
+          }
+          if (property.defaultSanitationRate16to30 != null) {
+            _sanitationTariff16to30Controller.text = property.defaultSanitationRate16to30.toString();
+          }
+        });
       }
     });
   }
