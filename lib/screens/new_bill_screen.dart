@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/bill_controller.dart';
+import '../controllers/property_controller.dart';
 import '../entities/bill.dart';
 import '../entities/meter_reading.dart';
 import '../entities/tariff.dart';
@@ -47,7 +48,40 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
     super.initState();
     if (widget.billToEdit != null) {
       _populateFormForEdit();
+    } else {
+      _loadPropertyDefaults();
     }
+  }
+
+  void _loadPropertyDefaults() async {
+    final propertyAsync = ref.read(propertyControllerProvider);
+    propertyAsync.whenData((property) {
+      if (property != null && mounted) {
+        setState(() {
+          if (property.defaultElectricityRate != null) {
+            _electricityTariffController.text = property.defaultElectricityRate.toString();
+          }
+          if (property.defaultWaterRate0to6 != null) {
+            _waterTariff0to6Controller.text = property.defaultWaterRate0to6.toString();
+          }
+          if (property.defaultWaterRate7to15 != null) {
+            _waterTariff7to15Controller.text = property.defaultWaterRate7to15.toString();
+          }
+          if (property.defaultWaterRate16to30 != null) {
+            _waterTariff16to30Controller.text = property.defaultWaterRate16to30.toString();
+          }
+          if (property.defaultSanitationRate0to6 != null) {
+            _sanitationTariff0to6Controller.text = property.defaultSanitationRate0to6.toString();
+          }
+          if (property.defaultSanitationRate7to15 != null) {
+            _sanitationTariff7to15Controller.text = property.defaultSanitationRate7to15.toString();
+          }
+          if (property.defaultSanitationRate16to30 != null) {
+            _sanitationTariff16to30Controller.text = property.defaultSanitationRate16to30.toString();
+          }
+        });
+      }
+    });
   }
 
   void _populateFormForEdit() {
@@ -309,6 +343,18 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
       appBar: AppBar(
         title: Text(widget.billToEdit != null ? 'Edit Bill' : 'New Bill'),
         actions: [
+          // Load defaults button
+          if (widget.billToEdit == null)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                _loadPropertyDefaults();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Property defaults loaded!')),
+                );
+              },
+              tooltip: 'Load Property Defaults',
+            ),
           // Debug button for pre-filling test data
           IconButton(
             icon: const Icon(Icons.bug_report),
@@ -508,6 +554,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                           prefixText: 'R',
                           filled: true,
                           fillColor: Colors.grey.shade50,
+                          helperText: 'Loaded from property defaults if available',
                         ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [
