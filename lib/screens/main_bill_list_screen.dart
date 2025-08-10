@@ -201,14 +201,14 @@ class MainBillListScreen extends ConsumerWidget {
                         
                         // Water sliding scale calculation
                         double waterCost = 0;
-                        int remainingUnits = waterUnits;
+                        double remainingUnits = waterUnits;
                         if (remainingUnits > 0) {
-                          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+                          final double firstTier = remainingUnits > 6 ? 6 : remainingUnits;
                           waterCost += firstTier * waterTariff0to6;
                           remainingUnits -= firstTier;
                         }
                         if (remainingUnits > 0) {
-                          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+                          final double secondTier = remainingUnits > 9 ? 9 : remainingUnits;
                           waterCost += secondTier * waterTariff7to15;
                           remainingUnits -= secondTier;
                         }
@@ -220,12 +220,12 @@ class MainBillListScreen extends ConsumerWidget {
                         double sanitationCost = 0;
                         remainingUnits = sanitationUnits;
                         if (remainingUnits > 0) {
-                          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+                          final double firstTier = remainingUnits > 6 ? 6 : remainingUnits;
                           sanitationCost += firstTier * sanitationTariff0to6;
                           remainingUnits -= firstTier;
                         }
                         if (remainingUnits > 0) {
-                          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+                          final double secondTier = remainingUnits > 9 ? 9 : remainingUnits;
                           sanitationCost += secondTier * sanitationTariff7to15;
                           remainingUnits -= secondTier;
                         }

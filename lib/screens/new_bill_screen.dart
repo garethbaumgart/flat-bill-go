@@ -195,12 +195,12 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
     if (_formKey.currentState!.validate() && _periodStart != null && _periodEnd != null) {
       try {
         // Parse meter readings
-        final int electricityOpen = int.parse(_electricityOpenController.text);
-        final int electricityClose = int.parse(_electricityCloseController.text);
-        final int waterOpen = int.parse(_waterOpenController.text);
-        final int waterClose = int.parse(_waterCloseController.text);
-        final int sanitationOpen = int.parse(_sanitationOpenController.text);
-        final int sanitationClose = int.parse(_sanitationCloseController.text);
+        final double electricityOpen = double.parse(_electricityOpenController.text);
+        final double electricityClose = double.parse(_electricityCloseController.text);
+        final double waterOpen = double.parse(_waterOpenController.text);
+        final double waterClose = double.parse(_waterCloseController.text);
+        final double sanitationOpen = double.parse(_sanitationOpenController.text);
+        final double sanitationClose = double.parse(_sanitationCloseController.text);
 
         // Parse tariffs
         final double electricityTariff = double.parse(_electricityTariffController.text);
@@ -212,23 +212,23 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         final double sanitationTariff16to30 = double.parse(_sanitationTariff16to30Controller.text);
 
         // Calculate units used
-        final int electricityUnits = electricityClose - electricityOpen;
-        final int waterUnits = waterClose - waterOpen;
-        final int sanitationUnits = sanitationClose - sanitationOpen;
+        final double electricityUnits = electricityClose - electricityOpen;
+        final double waterUnits = waterClose - waterOpen;
+        final double sanitationUnits = sanitationClose - sanitationOpen;
 
         // Calculate costs with sliding scale
         final double electricityCost = electricityUnits * electricityTariff;
         
         // Water sliding scale calculation
         double waterCost = 0;
-        int remainingUnits = waterUnits;
+        double remainingUnits = waterUnits;
         if (remainingUnits > 0) {
-          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+          final double firstTier = remainingUnits > 6 ? 6 : remainingUnits;
           waterCost += firstTier * waterTariff0to6;
           remainingUnits -= firstTier;
         }
         if (remainingUnits > 0) {
-          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+          final double secondTier = remainingUnits > 9 ? 9 : remainingUnits;
           waterCost += secondTier * waterTariff7to15;
           remainingUnits -= secondTier;
         }
@@ -240,12 +240,12 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         double sanitationCost = 0;
         remainingUnits = sanitationUnits;
         if (remainingUnits > 0) {
-          final int firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+          final double firstTier = remainingUnits > 6 ? 6 : remainingUnits;
           sanitationCost += firstTier * sanitationTariff0to6;
           remainingUnits -= firstTier;
         }
         if (remainingUnits > 0) {
-          final int secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+          final double secondTier = remainingUnits > 9 ? 9 : remainingUnits;
           sanitationCost += secondTier * sanitationTariff7to15;
           remainingUnits -= secondTier;
         }
@@ -510,11 +510,16 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                                 filled: true,
                                 fillColor: Colors.grey.shade50,
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Required';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'Invalid reading';
                                 }
                                 return null;
                               },
@@ -532,8 +537,10 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                                 filled: true,
                                 fillColor: Colors.grey.shade50,
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Required';
@@ -609,11 +616,16 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                                 filled: true,
                                 fillColor: Colors.grey.shade50,
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Required';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'Invalid reading';
                                 }
                                 return null;
                               },
@@ -631,8 +643,10 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                                 filled: true,
                                 fillColor: Colors.grey.shade50,
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Required';
@@ -774,11 +788,16 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                                 filled: true,
                                 fillColor: Colors.grey.shade50,
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Required';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'Invalid reading';
                                 }
                                 return null;
                               },
@@ -796,8 +815,10 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                                 filled: true,
                                 fillColor: Colors.grey.shade50,
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Required';

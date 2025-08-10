@@ -1,5 +1,5 @@
 class TariffStep {
-  final int upToUnits;
+  final double upToUnits;
   final double rate;
   
   const TariffStep({required this.upToUnits, required this.rate});
@@ -10,7 +10,7 @@ class TariffStep {
   };
   
   factory TariffStep.fromJson(Map<String, dynamic> json) => TariffStep(
-    upToUnits: json['upToUnits'],
-    rate: json['rate'],
+    upToUnits: (json['upToUnits'] as num).toDouble(),
+    rate: (json['rate'] as num).toDouble(),
   );
 }

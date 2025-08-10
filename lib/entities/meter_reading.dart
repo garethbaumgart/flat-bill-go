@@ -1,10 +1,10 @@
 class MeterReading {
-  final int opening;
-  final int closing;
+  final double opening;
+  final double closing;
   
   const MeterReading({required this.opening, required this.closing}) : assert(closing >= opening);
   
-  int get unitsUsed => closing - opening;
+  double get unitsUsed => closing - opening;
   
   Map<String, dynamic> toJson() => {
     'opening': opening,
@@ -12,7 +12,7 @@ class MeterReading {
   };
   
   factory MeterReading.fromJson(Map<String, dynamic> json) => MeterReading(
-    opening: json['opening'],
-    closing: json['closing'],
+    opening: (json['opening'] as num).toDouble(),
+    closing: (json['closing'] as num).toDouble(),
   );
 }

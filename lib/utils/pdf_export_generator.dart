@@ -146,9 +146,9 @@ class PdfExportGenerator {
 
   static pw.Widget _buildUtilitySection({
     required String title,
-    required int openingReading,
-    required int closingReading,
-    required int unitsUsed,
+    required double openingReading,
+    required double closingReading,
+    required double unitsUsed,
     required String unitType,
     required double costPerUnit,
     required double calculatedCost,
