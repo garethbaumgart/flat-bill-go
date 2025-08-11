@@ -261,27 +261,27 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
                   // Electricity Row
                   _buildTableRow(
                     'Electricity',
-                    widget.bill.electricityReading.opening.toString(),
-                    widget.bill.electricityReading.closing.toString(),
-                    widget.bill.electricityReading.unitsUsed.toString(),
+                    widget.bill.electricityReading.opening.toStringAsFixed(1),
+                    widget.bill.electricityReading.closing.toStringAsFixed(1),
+                    widget.bill.electricityReading.unitsUsed.toStringAsFixed(1),
                     _formatCurrency(widget.electricityCost),
                   ),
                   
                   // Water Row
                   _buildTableRow(
                     'Water',
-                    widget.bill.waterReading.opening.toString(),
-                    widget.bill.waterReading.closing.toString(),
-                    widget.bill.waterReading.unitsUsed.toString(),
+                    widget.bill.waterReading.opening.toStringAsFixed(2),
+                    widget.bill.waterReading.closing.toStringAsFixed(2),
+                    widget.bill.waterReading.unitsUsed.toStringAsFixed(2),
                     _formatCurrency(widget.waterCost),
                   ),
                   
                   // Sanitation Row
                   _buildTableRow(
                     'Sanitation',
-                    widget.bill.sanitationReading.opening.toString(),
-                    widget.bill.sanitationReading.closing.toString(),
-                    widget.bill.sanitationReading.unitsUsed.toString(),
+                    widget.bill.sanitationReading.opening.toStringAsFixed(2),
+                    widget.bill.sanitationReading.closing.toStringAsFixed(2),
+                    widget.bill.sanitationReading.unitsUsed.toStringAsFixed(2),
                     _formatCurrency(widget.sanitationCost),
                   ),
                   
@@ -358,8 +358,8 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
                           Icons.electric_bolt,
                           Colors.orange,
                           [
-                            'Rate: R${widget.bill.electricityTariff.steps.first.rate.toStringAsFixed(2)}/kWh',
-                            'Units: ${widget.bill.electricityReading.unitsUsed} kWh',
+                            'Rate: R${widget.bill.electricityTariff.steps.first.rate.toStringAsFixed(4)}/kWh',
+                            'Units: ${widget.bill.electricityReading.unitsUsed.toStringAsFixed(1)} kWh',
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -373,7 +373,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
                             '0-6 kl: R${widget.bill.waterTariff.steps[0].rate.toStringAsFixed(2)}/kl',
                             '7-15 kl: R${widget.bill.waterTariff.steps[1].rate.toStringAsFixed(2)}/kl',
                             '16-30 kl: R${widget.bill.waterTariff.steps[2].rate.toStringAsFixed(2)}/kl',
-                            'Units: ${widget.bill.waterReading.unitsUsed} kl',
+                            'Units: ${widget.bill.waterReading.unitsUsed.toStringAsFixed(2)} kl',
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -387,7 +387,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
                             '0-6 kl: R${widget.bill.sanitationTariff.steps[0].rate.toStringAsFixed(2)}/kl',
                             '7-15 kl: R${widget.bill.sanitationTariff.steps[1].rate.toStringAsFixed(2)}/kl',
                             '16-30 kl: R${widget.bill.sanitationTariff.steps[2].rate.toStringAsFixed(2)}/kl',
-                            'Units: ${widget.bill.sanitationReading.unitsUsed} kl',
+                            'Units: ${widget.bill.sanitationReading.unitsUsed.toStringAsFixed(2)} kl',
                           ],
                         ),
                       ],
