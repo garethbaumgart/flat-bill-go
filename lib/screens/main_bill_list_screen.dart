@@ -197,7 +197,7 @@ class MainBillListScreen extends ConsumerWidget {
                         final sanitationTariff16to30 = bill.sanitationTariff.steps[2].rate;
                         
                         // Calculate costs
-                        final double electricityCost = electricityUnits * electricityTariff;
+                        final double electricityCost = double.parse((electricityUnits * electricityTariff).toStringAsFixed(2));
                         
                         // Water sliding scale calculation
                         double waterCost = 0;

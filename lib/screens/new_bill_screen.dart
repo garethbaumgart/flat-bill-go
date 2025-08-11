@@ -217,7 +217,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         final double sanitationUnits = sanitationClose - sanitationOpen;
 
         // Calculate costs with sliding scale
-        final double electricityCost = electricityUnits * electricityTariff;
+        final double electricityCost = double.parse((electricityUnits * electricityTariff).toStringAsFixed(2));
         
         // Water sliding scale calculation
         double waterCost = 0;
@@ -512,7 +512,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                               ),
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,1}')),
                               ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
@@ -539,7 +539,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                               ),
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,1}')),
                               ],
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
@@ -566,7 +566,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
                         ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,4}')),
                         ],
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {

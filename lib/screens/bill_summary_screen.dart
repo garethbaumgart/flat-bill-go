@@ -542,12 +542,12 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
   List<String> _getElectricityCalculationSteps() {
     final units = widget.bill.electricityReading.unitsUsed;
     final rate = widget.bill.electricityTariff.steps.first.rate;
-    final cost = units * rate;
+    final cost = double.parse((units * rate).toStringAsFixed(2));
     
     return [
-      'Units used: ${units.toStringAsFixed(2)} kWh',
-      'Rate: R${rate.toStringAsFixed(2)}/kWh',
-      'Calculation: ${units.toStringAsFixed(2)} × R${rate.toStringAsFixed(2)} = R${cost.toStringAsFixed(2)}',
+      'Units used: ${units.toStringAsFixed(1)} kWh',
+      'Rate: R${rate.toStringAsFixed(4)}/kWh',
+      'Calculation: ${units.toStringAsFixed(1)} × R${rate.toStringAsFixed(4)} = R${cost.toStringAsFixed(2)}',
     ];
   }
 
