@@ -399,6 +399,54 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
             
             const SizedBox(height: 32),
             
+            // Calculation Details Section
+            Card(
+              child: ExpansionTile(
+                leading: Icon(Icons.calculate, color: Colors.purple.shade700),
+                title: const Text(
+                  'Calculation Details',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Electricity Calculation
+                        _buildCalculationSection(
+                          'Electricity',
+                          Icons.electric_bolt,
+                          Colors.orange,
+                          _getElectricityCalculationSteps(),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Water Calculation
+                        _buildCalculationSection(
+                          'Water',
+                          Icons.water_drop,
+                          Colors.blue,
+                          _getWaterCalculationSteps(),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Sanitation Calculation
+                        _buildCalculationSection(
+                          'Sanitation',
+                          Icons.cleaning_services,
+                          Colors.green,
+                          _getSanitationCalculationSteps(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            
             // Export to PDF Button
             SizedBox(
               width: double.infinity,
@@ -488,5 +536,144 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
         ),
       );
     }
+  }
+
+  // Calculation helper methods
+  List<String> _getElectricityCalculationSteps() {
+    final units = widget.bill.electricityReading.unitsUsed;
+    final rate = widget.bill.electricityTariff.steps.first.rate;
+    final cost = units * rate;
+    
+    return [
+      'Units used: ${units.toStringAsFixed(2)} kWh',
+      'Rate: R${rate.toStringAsFixed(2)}/kWh',
+      'Calculation: ${units.toStringAsFixed(2)} × R${rate.toStringAsFixed(2)} = R${cost.toStringAsFixed(2)}',
+    ];
+  }
+
+  List<String> _getWaterCalculationSteps() {
+    final units = widget.bill.waterReading.unitsUsed;
+    final rate0to6 = widget.bill.waterTariff.steps[0].rate;
+    final rate7to15 = widget.bill.waterTariff.steps[1].rate;
+    final rate16to30 = widget.bill.waterTariff.steps[2].rate;
+    
+    final steps = <String>[
+      'Total units used: ${units.toStringAsFixed(2)} kl',
+    ];
+    
+    double remainingUnits = units;
+    double totalCost = 0;
+    
+    // First tier (0-6 kl)
+    if (remainingUnits > 0) {
+      final firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+      final firstTierCost = firstTier * rate0to6;
+      totalCost += firstTierCost;
+      steps.add('0-6 kl: ${firstTier.toStringAsFixed(2)} × R${rate0to6.toStringAsFixed(2)} = R${firstTierCost.toStringAsFixed(2)}');
+      remainingUnits -= firstTier;
+    }
+    
+    // Second tier (7-15 kl)
+    if (remainingUnits > 0) {
+      final secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+      final secondTierCost = secondTier * rate7to15;
+      totalCost += secondTierCost;
+      steps.add('7-15 kl: ${secondTier.toStringAsFixed(2)} × R${rate7to15.toStringAsFixed(2)} = R${secondTierCost.toStringAsFixed(2)}');
+      remainingUnits -= secondTier;
+    }
+    
+    // Third tier (16+ kl)
+    if (remainingUnits > 0) {
+      final thirdTierCost = remainingUnits * rate16to30;
+      totalCost += thirdTierCost;
+      steps.add('16+ kl: ${remainingUnits.toStringAsFixed(2)} × R${rate16to30.toStringAsFixed(2)} = R${thirdTierCost.toStringAsFixed(2)}');
+    }
+    
+    steps.add('Total water cost: R${totalCost.toStringAsFixed(2)}');
+    return steps;
+  }
+
+  List<String> _getSanitationCalculationSteps() {
+    final units = widget.bill.sanitationReading.unitsUsed;
+    final rate0to6 = widget.bill.sanitationTariff.steps[0].rate;
+    final rate7to15 = widget.bill.sanitationTariff.steps[1].rate;
+    final rate16to30 = widget.bill.sanitationTariff.steps[2].rate;
+    
+    final steps = <String>[
+      'Total units used: ${units.toStringAsFixed(2)} kl',
+    ];
+    
+    double remainingUnits = units;
+    double totalCost = 0;
+    
+    // First tier (0-6 kl)
+    if (remainingUnits > 0) {
+      final firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+      final firstTierCost = firstTier * rate0to6;
+      totalCost += firstTierCost;
+      steps.add('0-6 kl: ${firstTier.toStringAsFixed(2)} × R${rate0to6.toStringAsFixed(2)} = R${firstTierCost.toStringAsFixed(2)}');
+      remainingUnits -= firstTier;
+    }
+    
+    // Second tier (7-15 kl)
+    if (remainingUnits > 0) {
+      final secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+      final secondTierCost = secondTier * rate7to15;
+      totalCost += secondTierCost;
+      steps.add('7-15 kl: ${secondTier.toStringAsFixed(2)} × R${rate7to15.toStringAsFixed(2)} = R${secondTierCost.toStringAsFixed(2)}');
+      remainingUnits -= secondTier;
+    }
+    
+    // Third tier (16+ kl)
+    if (remainingUnits > 0) {
+      final thirdTierCost = remainingUnits * rate16to30;
+      totalCost += thirdTierCost;
+      steps.add('16+ kl: ${remainingUnits.toStringAsFixed(2)} × R${rate16to30.toStringAsFixed(2)} = R${thirdTierCost.toStringAsFixed(2)}');
+    }
+    
+    steps.add('Total sanitation cost: R${totalCost.toStringAsFixed(2)}');
+    return steps;
+  }
+
+  Widget _buildCalculationSection(String title, IconData icon, Color color, List<String> steps) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...steps.map((step) => Padding(
+            padding: const EdgeInsets.only(left: 28.0, bottom: 4.0),
+            child: Text(
+              step,
+              style: TextStyle(
+                color: Colors.grey.shade700,
+                fontSize: 14,
+                fontFamily: 'monospace',
+              ),
+            ),
+          )),
+        ],
+      ),
+    );
   }
 }
