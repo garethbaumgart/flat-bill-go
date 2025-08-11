@@ -1,5 +1,6 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'dart:math';
 import '../entities/bill.dart';
 
 class PdfExportGenerator {
@@ -15,6 +16,77 @@ class PdfExportGenerator {
     return date.year.toString();
   }
 
+  // Helper method to truncate to specified decimal places (no rounding)
+  static String _truncateToDecimals(num value, int decimals) {
+    final factor = pow(10, decimals);
+    final truncated = (value * factor).floor() / factor;
+    return truncated.toStringAsFixed(decimals);
+  }
+
+  // Calculate water cost using sliding scale (same logic as bill summary)
+  static double _calculateWaterCost(Bill bill) {
+    final units = bill.waterReading.unitsUsed;
+    final rate0to6 = bill.waterTariff.steps[0].rate;
+    final rate7to15 = bill.waterTariff.steps[1].rate;
+    final rate16to30 = bill.waterTariff.steps[2].rate;
+    
+    double remainingUnits = units;
+    double totalCost = 0;
+    
+    // First tier (0-6 kl)
+    if (remainingUnits > 0) {
+      final firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+      totalCost += firstTier * rate0to6;
+      remainingUnits -= firstTier;
+    }
+    
+    // Second tier (7-15 kl)
+    if (remainingUnits > 0) {
+      final secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+      totalCost += secondTier * rate7to15;
+      remainingUnits -= secondTier;
+    }
+    
+    // Third tier (16+ kl)
+    if (remainingUnits > 0) {
+      totalCost += remainingUnits * rate16to30;
+    }
+    
+    return totalCost;
+  }
+
+  // Calculate sanitation cost using sliding scale (same logic as bill summary)
+  static double _calculateSanitationCost(Bill bill) {
+    final units = bill.sanitationReading.unitsUsed;
+    final rate0to6 = bill.sanitationTariff.steps[0].rate;
+    final rate7to15 = bill.sanitationTariff.steps[1].rate;
+    final rate16to30 = bill.sanitationTariff.steps[2].rate;
+    
+    double remainingUnits = units;
+    double totalCost = 0;
+    
+    // First tier (0-6 kl)
+    if (remainingUnits > 0) {
+      final firstTier = remainingUnits > 6 ? 6 : remainingUnits;
+      totalCost += firstTier * rate0to6;
+      remainingUnits -= firstTier;
+    }
+    
+    // Second tier (7-15 kl)
+    if (remainingUnits > 0) {
+      final secondTier = remainingUnits > 9 ? 9 : remainingUnits;
+      totalCost += secondTier * rate7to15;
+      remainingUnits -= secondTier;
+    }
+    
+    // Third tier (16+ kl)
+    if (remainingUnits > 0) {
+      totalCost += remainingUnits * rate16to30;
+    }
+    
+    return totalCost;
+  }
+
   static pw.Document generateDetailedBillPdf({
     required Bill bill,
     required double electricityCost,
@@ -26,6 +98,12 @@ class PdfExportGenerator {
   }) {
     print('🔧 Debug: Generating PDF with costs - Electricity: $electricityCost, Water: $waterCost, Sanitation: $sanitationCost');
     print('🔧 Debug: Sanitation reading - Opening: ${bill.sanitationReading.opening}, Closing: ${bill.sanitationReading.closing}, Units: ${bill.sanitationReading.unitsUsed}');
+    
+    // Calculate costs using the same logic as bill summary
+    final calculatedWaterCost = _calculateWaterCost(bill);
+    final calculatedSanitationCost = _calculateSanitationCost(bill);
+    final calculatedElectricityCost = bill.electricityReading.unitsUsed * bill.electricityTariff.steps.first.rate;
+    
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -52,6 +130,7 @@ class PdfExportGenerator {
           ],
         ),
         build: (pw.Context context) => [
+          
           // ELECTRICITY Section (kept together but only moves if needed)
           _keepTogether(_buildUtilitySection(
             title: 'ELECTRICITY (electricity charged at residential B-tariff)',
@@ -60,9 +139,9 @@ class PdfExportGenerator {
             unitsUsed: bill.electricityReading.unitsUsed,
             unitType: 'Kwh',
             costPerUnit: bill.electricityTariff.steps.first.rate,
-            calculatedCost: electricityCost - (electricityCost * 0.15), // Remove VAT to get base cost
-            vatAmount: electricityCost * 0.15,
-            totalCost: electricityCost,
+            calculatedCost: calculatedElectricityCost,
+            vatAmount: calculatedElectricityCost * 0.15,
+            totalCost: calculatedElectricityCost + (calculatedElectricityCost * 0.15),
             isSlidingScale: false,
           )),
 
@@ -74,9 +153,9 @@ class PdfExportGenerator {
             unitsUsed: bill.waterReading.unitsUsed,
             unitType: 'Kl',
             costPerUnit: bill.waterTariff.steps.first.rate,
-            calculatedCost: waterCost - (waterCost * 0.15), // Remove VAT to get base cost
-            vatAmount: waterCost * 0.15,
-            totalCost: waterCost,
+            calculatedCost: calculatedWaterCost,
+            vatAmount: calculatedWaterCost * 0.15,
+            totalCost: calculatedWaterCost + (calculatedWaterCost * 0.15),
             isSlidingScale: true,
             tariffSteps: bill.waterTariff.steps,
           )),
@@ -89,9 +168,9 @@ class PdfExportGenerator {
             unitsUsed: bill.sanitationReading.unitsUsed,
             unitType: 'Kl',
             costPerUnit: bill.sanitationTariff.steps.first.rate,
-            calculatedCost: sanitationCost - (sanitationCost * 0.15), // Remove VAT to get base cost
-            vatAmount: sanitationCost * 0.15,
-            totalCost: sanitationCost,
+            calculatedCost: calculatedSanitationCost,
+            vatAmount: calculatedSanitationCost * 0.15,
+            totalCost: calculatedSanitationCost + (calculatedSanitationCost * 0.15),
             isSlidingScale: true,
             tariffSteps: bill.sanitationTariff.steps,
           )),
@@ -116,7 +195,8 @@ class PdfExportGenerator {
                   ),
                 ),
                 pw.Text(
-                  _formatCurrency(total),
+                  _formatCurrency(calculatedElectricityCost + calculatedWaterCost + calculatedSanitationCost + 
+                    (calculatedElectricityCost + calculatedWaterCost + calculatedSanitationCost) * 0.15),
                   style: pw.TextStyle(
                     fontSize: 18,
                     fontWeight: pw.FontWeight.bold,

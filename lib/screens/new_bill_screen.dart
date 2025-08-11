@@ -217,7 +217,7 @@ class _NewBillScreenState extends ConsumerState<NewBillScreen> {
         final double sanitationUnits = sanitationClose - sanitationOpen;
 
         // Calculate costs with sliding scale
-        final double electricityCost = double.parse((electricityUnits * electricityTariff).toStringAsFixed(2));
+        final double electricityCost = electricityUnits * electricityTariff; // No rounding in calculation
         
         // Water sliding scale calculation
         double waterCost = 0;

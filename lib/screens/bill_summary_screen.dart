@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
+import 'dart:math';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -538,16 +539,23 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     }
   }
 
+  // Helper method to truncate to specified decimal places (no rounding)
+  String _truncateToDecimals(num value, int decimals) {
+    final factor = pow(10, decimals);
+    final truncated = (value * factor).floor() / factor;
+    return truncated.toStringAsFixed(decimals);
+  }
+
   // Calculation helper methods
   List<String> _getElectricityCalculationSteps() {
     final units = widget.bill.electricityReading.unitsUsed;
     final rate = widget.bill.electricityTariff.steps.first.rate;
-    final cost = double.parse((units * rate).toStringAsFixed(2));
+    final cost = units * rate; // No rounding in calculation
     
     return [
-      'Units used: ${units.toStringAsFixed(1)} kWh',
-      'Rate: R${rate.toStringAsFixed(2)}/kWh',
-      'Calculation: ${units.toStringAsFixed(1)} × R${rate.toStringAsFixed(2)} = R${cost.toStringAsFixed(2)}',
+      'Units used: ${_truncateToDecimals(units, 1)} kWh',
+      'Rate: R${_truncateToDecimals(rate, 4)}/kWh',
+      'Calculation: ${_truncateToDecimals(units, 1)} × R${_truncateToDecimals(rate, 4)} = R${_truncateToDecimals(cost, 2)}',
     ];
   }
 
@@ -558,7 +566,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     final rate16to30 = widget.bill.waterTariff.steps[2].rate;
     
     final steps = <String>[
-      'Total units used: ${units.toStringAsFixed(2)} kl',
+      'Total units used: ${_truncateToDecimals(units, 2)} kl',
     ];
     
     double remainingUnits = units;
@@ -569,7 +577,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
       final firstTier = remainingUnits > 6 ? 6 : remainingUnits;
       final firstTierCost = firstTier * rate0to6;
       totalCost += firstTierCost;
-      steps.add('0-6 kl: ${firstTier.toStringAsFixed(2)} × R${rate0to6.toStringAsFixed(2)} = R${firstTierCost.toStringAsFixed(2)}');
+      steps.add('0-6 kl: ${_truncateToDecimals(firstTier, 2)} × R${_truncateToDecimals(rate0to6, 2)} = R${_truncateToDecimals(firstTierCost, 2)}');
       remainingUnits -= firstTier;
     }
     
@@ -578,7 +586,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
       final secondTier = remainingUnits > 9 ? 9 : remainingUnits;
       final secondTierCost = secondTier * rate7to15;
       totalCost += secondTierCost;
-      steps.add('7-15 kl: ${secondTier.toStringAsFixed(2)} × R${rate7to15.toStringAsFixed(2)} = R${secondTierCost.toStringAsFixed(2)}');
+      steps.add('7-15 kl: ${_truncateToDecimals(secondTier, 2)} × R${_truncateToDecimals(rate7to15, 2)} = R${_truncateToDecimals(secondTierCost, 2)}');
       remainingUnits -= secondTier;
     }
     
@@ -586,10 +594,10 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     if (remainingUnits > 0) {
       final thirdTierCost = remainingUnits * rate16to30;
       totalCost += thirdTierCost;
-      steps.add('16+ kl: ${remainingUnits.toStringAsFixed(2)} × R${rate16to30.toStringAsFixed(2)} = R${thirdTierCost.toStringAsFixed(2)}');
+      steps.add('16+ kl: ${_truncateToDecimals(remainingUnits, 2)} × R${_truncateToDecimals(rate16to30, 2)} = R${_truncateToDecimals(thirdTierCost, 2)}');
     }
     
-    steps.add('Total water cost: R${totalCost.toStringAsFixed(2)}');
+    steps.add('Total water cost: R${_truncateToDecimals(totalCost, 2)}');
     return steps;
   }
 
@@ -600,7 +608,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     final rate16to30 = widget.bill.sanitationTariff.steps[2].rate;
     
     final steps = <String>[
-      'Total units used: ${units.toStringAsFixed(2)} kl',
+      'Total units used: ${_truncateToDecimals(units, 2)} kl',
     ];
     
     double remainingUnits = units;
@@ -611,7 +619,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
       final firstTier = remainingUnits > 6 ? 6 : remainingUnits;
       final firstTierCost = firstTier * rate0to6;
       totalCost += firstTierCost;
-      steps.add('0-6 kl: ${firstTier.toStringAsFixed(2)} × R${rate0to6.toStringAsFixed(2)} = R${firstTierCost.toStringAsFixed(2)}');
+      steps.add('0-6 kl: ${_truncateToDecimals(firstTier, 2)} × R${_truncateToDecimals(rate0to6, 2)} = R${_truncateToDecimals(firstTierCost, 2)}');
       remainingUnits -= firstTier;
     }
     
@@ -620,7 +628,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
       final secondTier = remainingUnits > 9 ? 9 : remainingUnits;
       final secondTierCost = secondTier * rate7to15;
       totalCost += secondTierCost;
-      steps.add('7-15 kl: ${secondTier.toStringAsFixed(2)} × R${rate7to15.toStringAsFixed(2)} = R${secondTierCost.toStringAsFixed(2)}');
+      steps.add('7-15 kl: ${_truncateToDecimals(secondTier, 2)} × R${_truncateToDecimals(rate7to15, 2)} = R${_truncateToDecimals(secondTierCost, 2)}');
       remainingUnits -= secondTier;
     }
     
@@ -628,10 +636,10 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     if (remainingUnits > 0) {
       final thirdTierCost = remainingUnits * rate16to30;
       totalCost += thirdTierCost;
-      steps.add('16+ kl: ${remainingUnits.toStringAsFixed(2)} × R${rate16to30.toStringAsFixed(2)} = R${thirdTierCost.toStringAsFixed(2)}');
+      steps.add('16+ kl: ${_truncateToDecimals(remainingUnits, 2)} × R${_truncateToDecimals(rate16to30, 2)} = R${_truncateToDecimals(thirdTierCost, 2)}');
     }
     
-    steps.add('Total sanitation cost: R${totalCost.toStringAsFixed(2)}');
+    steps.add('Total sanitation cost: R${_truncateToDecimals(totalCost, 2)}');
     return steps;
   }
 
