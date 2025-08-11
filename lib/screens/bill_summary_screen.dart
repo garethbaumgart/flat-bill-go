@@ -546,8 +546,8 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     
     return [
       'Units used: ${units.toStringAsFixed(1)} kWh',
-      'Rate: R${rate.toStringAsFixed(4)}/kWh',
-      'Calculation: ${units.toStringAsFixed(1)} × R${rate.toStringAsFixed(4)} = R${cost.toStringAsFixed(2)}',
+      'Rate: R${rate.toStringAsFixed(2)}/kWh',
+      'Calculation: ${units.toStringAsFixed(1)} × R${rate.toStringAsFixed(2)} = R${cost.toStringAsFixed(2)}',
     ];
   }
 
