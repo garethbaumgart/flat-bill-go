@@ -302,7 +302,7 @@ class PdfExportGenerator {
               children: [
                 pw.Text('cost/unit:', style: const pw.TextStyle(fontSize: 12)),
                 pw.Text(
-                  _formatCurrency(costPerUnit),
+                  'R${_truncateToDecimals(costPerUnit, 4)}/kWh',
                   style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
                 ),
               ],
