@@ -173,7 +173,7 @@ class _PropertyDetailsScreenState extends ConsumerState<PropertyDetailsScreen> {
                         ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,4}')),
                         ],
                         validator: (value) {
                           if (value != null && value.trim().isNotEmpty && double.tryParse(value) == null) {
