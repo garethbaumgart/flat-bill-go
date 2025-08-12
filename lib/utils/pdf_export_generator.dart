@@ -144,6 +144,7 @@ class PdfExportGenerator {
             totalCost: calculatedElectricityCost + (calculatedElectricityCost * 0.15),
             isSlidingScale: false,
           )),
+          pw.SizedBox(height: 20),
 
           // WATER Section (kept together but only moves if needed)
           _keepTogether(_buildUtilitySection(
@@ -159,6 +160,7 @@ class PdfExportGenerator {
             isSlidingScale: true,
             tariffSteps: bill.waterTariff.steps,
           )),
+          pw.SizedBox(height: 20),
 
           // SANITATION Section (kept together but only moves if needed)
           _keepTogether(_buildUtilitySection(
