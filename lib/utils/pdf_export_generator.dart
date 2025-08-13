@@ -109,98 +109,125 @@ class PdfExportGenerator {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(40),
-        header: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'UTILITY BILL SUMMARY',
-              style: pw.TextStyle(
-                fontSize: 24,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.blue900,
+        margin: const pw.EdgeInsets.all(20), // Further reduced margins
+        header: (context) => pw.Container(
+          padding: const pw.EdgeInsets.only(bottom: 8), // Minimal padding
+          decoration: pw.BoxDecoration(
+            border: pw.Border(
+              bottom: pw.BorderSide(color: PdfColors.grey300, width: 1),
+            ),
+          ),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'UTILITY BILL',
+                    style: pw.TextStyle(
+                      fontSize: 18, // Smaller title
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.blue900,
+                    ),
+                  ),
+                  pw.Text(
+                    '${bill.invoiceNumber} | ${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().year}',
+                    style: pw.TextStyle(
+                      fontSize: 10,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.blue900,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            pw.SizedBox(height: 8),
-            pw.Text(
-              'Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)} ${_formatYear(bill.periodStart)}',
-              style: const pw.TextStyle(fontSize: 14),
-            ),
-            pw.SizedBox(height: 16),
-          ],
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)} ${_formatYear(bill.periodStart)}',
+                style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: pw.FontWeight.normal,
+                  color: PdfColors.grey800,
+                ),
+              ),
+            ],
+          ),
         ),
         build: (pw.Context context) => [
           
-          // ELECTRICITY Section (kept together but only moves if needed)
-          _keepTogether(_buildUtilitySection(
-            title: 'ELECTRICITY (electricity charged at residential B-tariff)',
+          // Compact utility sections in a more condensed layout
+          _buildCompactUtilitySection(
+            title: 'ELECTRICITY',
             openingReading: bill.electricityReading.opening,
             closingReading: bill.electricityReading.closing,
             unitsUsed: bill.electricityReading.unitsUsed,
-            unitType: 'Kwh',
+            unitType: 'kWh',
             costPerUnit: bill.electricityTariff.steps.first.rate,
             calculatedCost: calculatedElectricityCost,
             vatAmount: calculatedElectricityCost * 0.15,
             totalCost: calculatedElectricityCost + (calculatedElectricityCost * 0.15),
             isSlidingScale: false,
-          )),
-          pw.SizedBox(height: 20),
+            utilityColor: PdfColors.orange,
+          ),
+          pw.SizedBox(height: 8),
 
-          // WATER Section (kept together but only moves if needed)
-          _keepTogether(_buildUtilitySection(
-            title: 'WATER (water charged on sliding scale)',
+          _buildCompactUtilitySection(
+            title: 'WATER',
             openingReading: bill.waterReading.opening,
             closingReading: bill.waterReading.closing,
             unitsUsed: bill.waterReading.unitsUsed,
-            unitType: 'Kl',
+            unitType: 'kl',
             costPerUnit: bill.waterTariff.steps.first.rate,
             calculatedCost: calculatedWaterCost,
             vatAmount: calculatedWaterCost * 0.15,
             totalCost: calculatedWaterCost + (calculatedWaterCost * 0.15),
             isSlidingScale: true,
             tariffSteps: bill.waterTariff.steps,
-          )),
-          pw.SizedBox(height: 20),
+            utilityColor: PdfColors.blue,
+          ),
+          pw.SizedBox(height: 8),
 
-          // SANITATION Section (kept together but only moves if needed)
-          _keepTogether(_buildUtilitySection(
-            title: 'SANITATION (sanitation charged on sliding scale)',
+          _buildCompactUtilitySection(
+            title: 'SANITATION',
             openingReading: bill.sanitationReading.opening,
             closingReading: bill.sanitationReading.closing,
             unitsUsed: bill.sanitationReading.unitsUsed,
-            unitType: 'Kl',
+            unitType: 'kl',
             costPerUnit: bill.sanitationTariff.steps.first.rate,
             calculatedCost: calculatedSanitationCost,
             vatAmount: calculatedSanitationCost * 0.15,
             totalCost: calculatedSanitationCost + (calculatedSanitationCost * 0.15),
             isSlidingScale: true,
             tariffSteps: bill.sanitationTariff.steps,
-          )),
-          pw.SizedBox(height: 20),
+            utilityColor: PdfColors.green,
+          ),
+          pw.SizedBox(height: 12),
 
-          // Total Utilities Payable
+          // Final total
           pw.Container(
             width: double.infinity,
-            padding: const pw.EdgeInsets.all(15),
+            padding: const pw.EdgeInsets.all(12),
             decoration: pw.BoxDecoration(
-              color: PdfColors.grey100,
-              border: pw.Border.all(color: PdfColors.grey400),
+              color: PdfColors.blue50,
+              border: pw.Border.all(color: PdfColors.blue200, width: 2),
+              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
             ),
             child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
                 pw.Text(
-                  'Total Utilities payable:',
+                  'TOTAL AMOUNT DUE',
                   style: pw.TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.blue900,
                   ),
                 ),
                 pw.Text(
                   _formatCurrency(calculatedElectricityCost + calculatedWaterCost + calculatedSanitationCost + 
                     (calculatedElectricityCost + calculatedWaterCost + calculatedSanitationCost) * 0.15),
                   style: pw.TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: pw.FontWeight.bold,
                     color: PdfColors.blue900,
                   ),
@@ -215,18 +242,7 @@ class PdfExportGenerator {
     return pdf;
   }
 
-  // Helper to keep a widget from splitting across pages by wrapping it in a single-row table
-  static pw.Widget _keepTogether(pw.Widget child) {
-    return pw.Table(
-      border: null,
-      columnWidths: const {0: pw.FlexColumnWidth()},
-      children: [
-        pw.TableRow(children: [child]),
-      ],
-    );
-  }
-
-  static pw.Widget _buildUtilitySection({
+  static pw.Widget _buildCompactUtilitySection({
     required String title,
     required double openingReading,
     required double closingReading,
@@ -238,175 +254,142 @@ class PdfExportGenerator {
     required double totalCost,
     required bool isSlidingScale,
     List? tariffSteps,
+    PdfColor? utilityColor,
   }) {
     return pw.Container(
       width: double.infinity,
-      padding: const pw.EdgeInsets.all(15),
+      padding: const pw.EdgeInsets.all(8), // Very compact padding
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.grey400),
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+        color: PdfColors.white,
+        border: pw.Border.all(color: utilityColor ?? PdfColors.grey400, width: 1),
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          // Title
-          pw.Text(
-            title,
-            style: pw.TextStyle(
-              fontSize: 14,
-              fontWeight: pw.FontWeight.bold,
-              color: PdfColors.blue900,
+          // Compact header
+          pw.Container(
+            width: double.infinity,
+            padding: const pw.EdgeInsets.all(6),
+            decoration: pw.BoxDecoration(
+              color: PdfColors.grey100,
+              borderRadius: const pw.BorderRadius.only(
+                topLeft: pw.Radius.circular(6),
+                topRight: pw.Radius.circular(6),
+              ),
+            ),
+            child: pw.Text(
+              title,
+              style: pw.TextStyle(
+                fontSize: 12,
+                fontWeight: pw.FontWeight.bold,
+                color: utilityColor ?? PdfColors.blue900,
+              ),
             ),
           ),
-          pw.SizedBox(height: 15),
+          pw.SizedBox(height: 8),
 
-          // Readings
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          // Compact readings and calculations in a table format
+          pw.Table(
+            border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+            columnWidths: const {
+              0: pw.FlexColumnWidth(2),
+              1: pw.FlexColumnWidth(1),
+            },
             children: [
-              pw.Text('Opening reading:', style: const pw.TextStyle(fontSize: 12)),
-              pw.Text(
-                openingReading.toStringAsFixed(3),
-                style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-              ),
-            ],
-          ),
-          pw.SizedBox(height: 5),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('Closing reading:', style: const pw.TextStyle(fontSize: 12)),
-              pw.Text(
-                closingReading.toStringAsFixed(3),
-                style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-              ),
-            ],
-          ),
-          pw.SizedBox(height: 10),
-
-          // Units Used
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('units used($unitType):', style: const pw.TextStyle(fontSize: 12)),
-              pw.Text(
-                unitsUsed.toStringAsFixed(2),
-                style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-              ),
-            ],
-          ),
-          pw.SizedBox(height: 15),
-
-          // Cost Calculation
-          if (!isSlidingScale) ...[
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text('cost/unit:', style: const pw.TextStyle(fontSize: 12)),
-                pw.Text(
-                  'R${_truncateToDecimals(costPerUnit, 4)}/kWh',
-                  style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-                ),
-              ],
-            ),
-            pw.SizedBox(height: 5),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text('Calculated cost:', style: const pw.TextStyle(fontSize: 12)),
-                pw.Text(
-                  _formatCurrency(calculatedCost),
-                  style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-                ),
-              ],
-            ),
-          ] else ...[
-            // Sliding scale calculation
-            if (tariffSteps != null) ...[
-              pw.Text('Cost Calculation (Sliding Scale):', style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 5),
-              ...tariffSteps.asMap().entries.map((entry) {
-                final index = entry.key;
-                final step = entry.value;
-                final stepRange = index == 0 ? '0-6' : index == 1 ? '7-15' : '16-30';
-                final stepUnit = 'Kl';
-                
-                return pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('For $stepRange$stepUnit:', style: const pw.TextStyle(fontSize: 12)),
-                    pw.Text(
-                      _formatCurrency(step.rate),
-                      style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-                    ),
-                  ],
-                );
-              }),
-              pw.SizedBox(height: 5),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              // Readings row
+              pw.TableRow(
                 children: [
-                  pw.Text('Calculated cost:', style: const pw.TextStyle(fontSize: 12)),
-                  pw.Text(
-                    _formatCurrency(calculatedCost),
-                    style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text('Readings', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold)),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      '${openingReading.toStringAsFixed(1)} - ${closingReading.toStringAsFixed(1)} (${unitsUsed.toStringAsFixed(1)} $unitType)',
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(fontSize: 9),
+                    ),
+                  ),
+                ],
+              ),
+              // Rate row
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      isSlidingScale ? 'Rate Type' : 'Rate per unit',
+                      style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold)
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      isSlidingScale ? 'Sliding Scale' : 'R${_truncateToDecimals(costPerUnit, 4)}',
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(fontSize: 9),
+                    ),
+                  ),
+                ],
+              ),
+              // Base cost row
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text('Base cost', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold)),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      _formatCurrency(calculatedCost),
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              // VAT row
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text('VAT (15%)', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold)),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      _formatCurrency(vatAmount),
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(fontSize: 9, color: PdfColors.red700),
+                    ),
+                  ),
+                ],
+              ),
+              // Total row
+              pw.TableRow(
+                decoration: pw.BoxDecoration(color: PdfColors.grey50),
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      'TOTAL',
+                      style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: utilityColor ?? PdfColors.blue900),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(
+                      _formatCurrency(totalCost),
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: utilityColor ?? PdfColors.blue900),
+                    ),
                   ),
                 ],
               ),
             ],
-          ],
-          pw.SizedBox(height: 15),
-
-          // VAT
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('vat:', style: const pw.TextStyle(fontSize: 12)),
-              pw.Text('15%', style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-            ],
-          ),
-          pw.SizedBox(height: 5),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('Calculated VAT amount:', style: const pw.TextStyle(fontSize: 12)),
-              pw.Text(
-                _formatCurrency(vatAmount),
-                style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-              ),
-            ],
-          ),
-          pw.SizedBox(height: 15),
-
-          // Total for this utility
-          pw.Container(
-            width: double.infinity,
-            padding: const pw.EdgeInsets.all(10),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.blue50,
-              border: pw.Border.all(color: PdfColors.blue200),
-            ),
-            child: pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text(
-                  'Total ${title.split(' ')[0]}:',
-                  style: pw.TextStyle(
-                    fontSize: 14,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.blue900,
-                  ),
-                ),
-                pw.Text(
-                  _formatCurrency(totalCost),
-                  style: pw.TextStyle(
-                    fontSize: 14,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.blue900,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
