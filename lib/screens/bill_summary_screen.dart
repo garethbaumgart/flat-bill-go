@@ -7,7 +7,9 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import '../entities/bill.dart';
+import '../entities/property.dart';
 import '../controllers/bill_controller.dart';
+import '../controllers/property_controller.dart';
 import 'new_bill_screen.dart';
 import 'dart:convert';
 import 'package:universal_html/html.dart' as html;
@@ -57,6 +59,11 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
     try {
       print('🔧 Debug: Starting PDF export...');
       
+      // Get property information
+      final propertyAsync = ref.read(propertyControllerProvider);
+      Property? property;
+      propertyAsync.whenData((prop) => property = prop);
+      
       // Generate detailed PDF using the new generator
       final pdf = PdfExportGenerator.generateDetailedBillPdf(
         bill: widget.bill,
@@ -66,6 +73,7 @@ class _BillSummaryScreenState extends ConsumerState<BillSummaryScreen> {
         subtotal: widget.subtotal,
         vat: widget.vat,
         total: widget.total,
+        property: property,
       );
       
       // Generate filename

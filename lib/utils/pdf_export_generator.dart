@@ -2,6 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:math';
 import '../entities/bill.dart';
+import '../entities/property.dart';
 
 class PdfExportGenerator {
   static String _formatCurrency(double amount) {
@@ -95,6 +96,7 @@ class PdfExportGenerator {
     required double subtotal,
     required double vat,
     required double total,
+    Property? property,
   }) {
     print('🔧 Debug: Generating PDF with costs - Electricity: $electricityCost, Water: $waterCost, Sanitation: $sanitationCost');
     print('🔧 Debug: Sanitation reading - Opening: ${bill.sanitationReading.opening}, Closing: ${bill.sanitationReading.closing}, Units: ${bill.sanitationReading.unitsUsed}');
@@ -142,6 +144,18 @@ class PdfExportGenerator {
                 ],
               ),
               pw.SizedBox(height: 4),
+              // Add property address if available
+              if (property != null && property.address.isNotEmpty) ...[
+                pw.Text(
+                  property.address,
+                  style: pw.TextStyle(
+                    fontSize: 9,
+                    fontWeight: pw.FontWeight.normal,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+                pw.SizedBox(height: 2),
+              ],
               pw.Text(
                 'Period: ${_formatDate(bill.periodStart)} to ${_formatDate(bill.periodEnd)} ${_formatYear(bill.periodStart)}',
                 style: pw.TextStyle(
